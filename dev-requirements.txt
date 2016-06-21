@@ -1,0 +1,5 @@
+nose
+mock
+nose-cov
+testtools
+testfixtures
