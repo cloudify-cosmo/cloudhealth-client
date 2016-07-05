@@ -65,4 +65,4 @@ class CloudHealth(object):
         self._client = HTTPClient(endpoint, api_key)
         self.reports = ReportsClient(self._client)
         self.assets = AssetsClient(self._client)
-        self.cost = CostsClient(self._client)
+        self.costs = CostsClient(self._client)
