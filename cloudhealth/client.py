@@ -20,6 +20,7 @@ from requests.packages import urllib3
 
 from cloudhealth.reports import ReportsClient
 from cloudhealth.assets import AssetsClient
+from cloudhealth.cost import CostsClient
 
 
 DEFAULT_CLOUDHEALTH_API_URL = 'https://chapi.cloudhealthtech.com/'
@@ -64,3 +65,4 @@ class CloudHealth(object):
         self._client = HTTPClient(endpoint, api_key)
         self.reports = ReportsClient(self._client)
         self.assets = AssetsClient(self._client)
+        self.cost = CostsClient(self._client)
