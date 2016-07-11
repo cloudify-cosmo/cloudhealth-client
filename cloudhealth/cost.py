@@ -17,8 +17,8 @@ class CostsClient(object):
         accounts_client = accounts.AccountsClient(self.client)
         list_of_aws_accounts = accounts_client.list("AWS-Account")
 
-        prices = response['data']
-        for accounts_total in prices:
+        costs = response['data']
+        for accounts_total in costs:
             accounts_total_cost.append(accounts_total[0][0])
 
         cost_by_account = dict(zip(list_of_aws_accounts, accounts_total_cost))
