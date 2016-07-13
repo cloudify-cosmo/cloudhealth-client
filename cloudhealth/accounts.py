@@ -4,11 +4,11 @@ class AccountsClient(object):
     def __init__(self, client):
         self.client = client
 
-    def list(self, type=None):
+    def list(self, type='AWS-Account'):
         response = self.client.get(self.CURRENT_COST_URL)
 
         list_of_accounts = []
-        accounts_list = response['dimensions'][0]["AWS-Account"]
+        accounts_list = response['dimensions'][0][type]
 
         for account in accounts_list:
             label = account['label']

@@ -1,6 +1,5 @@
-# https://chapi.cloudhealthtech.com/olap_reports?api_key=<your api key>
-
 from . import accounts
+
 
 class CostsClient(object):
     CURRENT_COST_URL = '/olap_reports/cost/current'
@@ -9,13 +8,13 @@ class CostsClient(object):
     def __init__(self, client):
         self.client = client
 
-    def get_current(self, account_name=None):
+    def get_current(self, account_name=None, account_type='AWS-Account'):
         response = self.client.get(self.CURRENT_COST_URL)
 
         accounts_total_cost = []
 
         accounts_client = accounts.AccountsClient(self.client)
-        list_of_aws_accounts = accounts_client.list("AWS-Account")
+        list_of_aws_accounts = accounts_client.list(account_type)
 
         costs = response['data']
         for accounts_total in costs:
@@ -24,6 +23,6 @@ class CostsClient(object):
         cost_by_account = dict(zip(list_of_aws_accounts, accounts_total_cost))
 
         if account_name:
-           return cost_by_account[account_name]
+            return cost_by_account[account_name]
         else:
-           return cost_by_account['Total']
+            return cost_by_account['Total']

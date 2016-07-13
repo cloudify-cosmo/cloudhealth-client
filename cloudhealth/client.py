@@ -13,12 +13,10 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-import json
-
 import requests
 from requests.packages import urllib3
 
-from .cost import CostsClient
+from .costs import CostsClient
 from .assets import AssetsClient
 from .reports import ReportsClient
 from .accounts import AccountsClient
@@ -58,7 +56,6 @@ class HTTPClient(object):
                                 headers=headers,
                                 stream=stream)
         return response.json()
-        return json.dumps(response.json(), indent=4, sort_keys=True)
 
 
 class CloudHealth(object):
