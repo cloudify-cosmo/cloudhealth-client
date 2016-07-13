@@ -30,14 +30,14 @@ class ReportsClient(object):
 
         return topics
 
-    def get(self, id=None, topic='None', report_name=None):
+    def get(self, id=None, topic=None, report_name=None):
         if id:
             uri = '/olap_reports/custom/{0}'.format(id)
-        elif topic and report:
+        elif topic and report_name:
             uri = '/olap_reports/{0}/{1}'.format(topic, report_name)
         else:
             raise exceptions.CloudHealthError(
-                'Must either provide a report id or a topic and report_name')
+                'Must either provide a report id or a topic and report-name')
 
         report = self.client.get(uri)
         return report

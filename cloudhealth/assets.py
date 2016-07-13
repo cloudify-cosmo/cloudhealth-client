@@ -1,8 +1,3 @@
-# https://chapi.cloudhealthtech.com/olap_reports?api_key=<your api key>
-
-from cloudhealth import exceptions
-
-
 class AssetsClient(object):
     def __init__(self, client):
         self.client = client

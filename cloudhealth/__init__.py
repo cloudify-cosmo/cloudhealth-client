@@ -13,4 +13,4 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
-from cloudhealth.client import CloudHealth  # noqa
+from .client import CloudHealth  # noqa

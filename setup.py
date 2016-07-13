@@ -23,7 +23,14 @@ setup(
     packages=['cloudhealth'],
     license='LICENSE',
     description='A REST Client for Cloudhealth',
+    entry_points={
+        'console_scripts': [
+            'cloudhealth = cloudhealth.cli:_cloudhealth'
+        ]
+    },
     install_requires=[
-        'requests==2.7.0'
+        'click==6.6',
+        'requests==2.7.0',
+        'click_didyoumean==0.0.3',
     ]
 )
