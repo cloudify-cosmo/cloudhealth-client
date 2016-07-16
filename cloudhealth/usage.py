@@ -12,8 +12,8 @@ class UsageClient(object):
 
         total_usage = []
 
-        months_client = date.DateClient(self.client)
-        list_of_days = months_client.list_days()
+        date_client = date.DateClient(self.client)
+        list_of_days = date_client.list_days()
 
         costs = response['data']
         for days_usage in costs:
@@ -22,6 +22,7 @@ class UsageClient(object):
         usage_for_day = dict(zip(list_of_days, total_usage))
 
         return usage_for_day
+
         # if account_name:
         #     return cost_by_account[account_name]
         # else:
