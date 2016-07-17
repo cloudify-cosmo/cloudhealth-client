@@ -1,4 +1,5 @@
-from . import date
+from datetime import date, timedelta
+from . import ch_date
 
 
 class UsageClient(object):
@@ -12,7 +13,7 @@ class UsageClient(object):
 
         total_usage = []
 
-        date_client = date.DateClient(self.client)
+        date_client = ch_date.DateClient(self.client)
         list_of_days = date_client.list_days()
 
         costs = response['data']
@@ -21,9 +22,8 @@ class UsageClient(object):
 
         usage_for_day = dict(zip(list_of_days, total_usage))
 
-        return usage_for_day
 
-        # if account_name:
-        #     return cost_by_account[account_name]
-        # else:
-        #     return cost_by_account['Total']
+        if day:
+            return usage_for_day[day]
+        else:
+            return usage_for_day[(date.today() - timedelta(1)).strftime('%Y-%m-%d')]
