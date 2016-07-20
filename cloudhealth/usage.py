@@ -1,20 +1,36 @@
 from datetime import date, timedelta
-from . import ch_date
+
+
+def _get_yesterdays_date():
+    return (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
 
 class UsageClient(object):
-    USAGE_URL = 'olap_reports/usage/instance'
+    USAGE_URL = 'olap_reports/usage'
 
     def __init__(self, client):
         self.client = client
 
-    def get_usage(self, day=None):
-        response = self.client.get(self.USAGE_URL)
+    def list_days(self, uri):
+        response = self.client.get(uri)
+
+
+        list_of_days = []
+        days = response['dimensions'][0]["time"]
+
+        for day in days:
+            label = day['label']
+            list_of_days.append(label.encode('ascii'))
+
+        return list_of_days
+
+    def get(self, resource_type, date=_get_yesterdays_date()):
+        uri = self.USAGE_URL + '/' + resource_type
+        response = self.client.get(uri)
 
         total_usage = []
 
-        date_client = ch_date.DateClient(self.client)
-        list_of_days = date_client.list_days()
+        list_of_days = self.list_days(uri)
 
         costs = response['data']
         for days_usage in costs:
@@ -22,8 +38,4 @@ class UsageClient(object):
 
         usage_for_day = dict(zip(list_of_days, total_usage))
 
-
-        if day:
-            return usage_for_day[day]
-        else:
-            return usage_for_day[(date.today() - timedelta(1)).strftime('%Y-%m-%d')]
+        return usage_for_day[date]

@@ -18,7 +18,6 @@ from requests.packages import urllib3
 
 from .costs import CostsClient
 from .usage import UsageClient
-from .ch_date import DateClient
 from .assets import AssetsClient
 from .reports import ReportsClient
 from .accounts import AccountsClient
@@ -57,6 +56,10 @@ class HTTPClient(object):
                                 params=params,
                                 headers=headers,
                                 stream=stream)
+        if response.status_code != 200:
+            raise RuntimeError(
+                'Request to {0} failed! (HTTP Error Code: {1})'.format(
+                    url, response.status_code))
         return response.json()
 
 
@@ -67,6 +70,5 @@ class CloudHealth(object):
         self.accounts = AccountsClient(self._client)
         self.reports = ReportsClient(self._client)
         self.assets = AssetsClient(self._client)
-        self.ch_date = DateClient(self._client)
         self.costs = CostsClient(self._client)
         self.usage = UsageClient(self._client)
