@@ -8,6 +8,18 @@ class CostsClient(object):
     def __init__(self, client):
         self.client = client
 
+    def list_months(self, type=None):
+        response = self.client.get(self.HISTORY_COST_URL)
+
+        list_of_months = []
+        months = response['dimensions'][0]["time"]
+
+        for month in months:
+            label = month['label']
+            list_of_months.append(label.encode('ascii'))
+
+        print list_of_months
+
     def get_current(self, account_name=None, account_type='AWS-Account'):
         response = self.client.get(self.CURRENT_COST_URL)
 

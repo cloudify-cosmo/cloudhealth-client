@@ -60,12 +60,45 @@ def current_cost(ctx, account_name, account_type):
     """Retrieve current cost.
 
     Specifying an account name will get the current cost for that account only.
-    Specifying an account type will get the cost to all acounts of that type.
+    Specifying an account type will get the cost to all accounts of that type.
     Omitting both will get the total cost of all accounts.
     """
     costs = ctx.obj['client']
     cost = costs.get_current(account_name, account_type)
     print(cost)
+
+
+@_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
+@click.pass_context
+def usage(ctx):
+    """Retrieve cost related information
+    """
+    ctx.obj['client'] = ctx.obj['client'].usage
+
+
+
+@usage.command('get')
+@click.option('-d',
+              '--date',
+              help='Resource usage per day [defaults to yesterday]')
+@click.argument('resource-type')
+@click.pass_context
+def get_usage(ctx, resource_type, date):
+    """Retrieve usage statistics by day and resource type.
+
+    Specifying Date will get you the usage for that day.
+    Specifying Resource type will get you the usage for a particular resources by Day.
+    Omitting Date will get you the usage for yesterday.
+    """
+    usage = ctx.obj['client']
+    if date and resource_type:
+        print(usage.get(resource_type=resource_type, date=date))
+    elif resource_type:
+        print(usage.get(resource_type=resource_type))
+    elif date:
+        print(usage.get(date=date))
+    else:
+        print(usage.get())
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
