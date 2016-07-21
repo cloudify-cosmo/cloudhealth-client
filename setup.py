@@ -17,7 +17,7 @@ from setuptools import setup
 
 setup(
     name='cloudhealth',
-    version='0.1.0',
+    version='0.1.1',
     author='Nir Cohen',
     author_email='nir36g@gmail.com',
     packages=['cloudhealth'],
@@ -25,7 +25,8 @@ setup(
     description='A REST Client for Cloudhealth',
     entry_points={
         'console_scripts': [
-            'cloudhealth = cloudhealth.cli:_cloudhealth'
+            'cloudhealth = cloudhealth.cli:_cloudhealth',
+            'clh = cloudhealth.cli:_cloudhealth'
         ]
     },
     install_requires=[

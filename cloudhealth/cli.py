@@ -34,20 +34,24 @@ CLICK_CONTEXT_SETTINGS = dict(
 @click.pass_context
 def _cloudhealth(ctx, api_key):
     """A CloudHealth Command Line Interface
+
+    You can set the `CLOUDHEALTH_API_KEY` environment variable instead
+    of using the `--api-key` everytime.
     """
+    # TODO: Expose `--api-key` to all commands.
     ctx.obj = {}
     ctx.obj['client'] = client.CloudHealth(api_key)
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
 @click.pass_context
-def costs(ctx):
+def cost(ctx):
     """Retrieve cost related information
     """
-    ctx.obj['client'] = ctx.obj['client'].costs
+    ctx.obj['client'] = ctx.obj['client'].cost
 
 
-@costs.command('current')
+@cost.command('current')
 @click.option('-n',
               '--account-name',
               help='The account to get the cost for')
@@ -63,32 +67,31 @@ def current_cost(ctx, account_name, account_type):
     Specifying an account type will get the cost to all accounts of that type.
     Omitting both will get the total cost of all accounts.
     """
-    costs = ctx.obj['client']
-    cost = costs.get_current(account_name, account_type)
-    print(cost)
+    cost = ctx.obj['client']
+    print(cost.get_current(account_name, account_type))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
 @click.pass_context
 def usage(ctx):
-    """Retrieve cost related information
+    """Retrieve resource usage related information
     """
     ctx.obj['client'] = ctx.obj['client'].usage
 
 
-
 @usage.command('get')
+@click.argument('resource-type')
 @click.option('-d',
               '--date',
               help='Resource usage per day [defaults to yesterday]')
-@click.argument('resource-type')
 @click.pass_context
 def get_usage(ctx, resource_type, date):
     """Retrieve usage statistics by day and resource type.
 
     Specifying Date will get you the usage for that day.
-    Specifying Resource type will get you the usage for a particular resources by Day.
-    Omitting Date will get you the usage for yesterday.
+    Specifying Resource type will get you the usage for a particular resources
+    by date.
+    Omitting date will get you the usage for yesterday.
     """
     usage = ctx.obj['client']
     if date and resource_type:
@@ -104,7 +107,7 @@ def get_usage(ctx, resource_type, date):
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
 @click.pass_context
 def reports(ctx):
-    """Retrieve cost related information
+    """Retrieve report related information
     """
     ctx.obj['client'] = ctx.obj['client'].reports
 
@@ -154,8 +157,7 @@ def get_report(ctx, id, topic, report_name):
     """Retrieve a specific report
     """
     reports = ctx.obj['client']
-    report = reports.get(id, topic, report_name)
-    print(report)
+    print(reports.get(id, topic, report_name))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
@@ -184,8 +186,7 @@ def get_asset(ctx, object_name):
     """Retrieve a specific asset.
     """
     assets = ctx.obj['client']
-    asset = assets.get(object_name)
-    print(asset)
+    print(assets.get(object_name))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)

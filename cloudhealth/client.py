@@ -16,7 +16,7 @@
 import requests
 from requests.packages import urllib3
 
-from .costs import CostsClient
+from .cost import CostClient
 from .usage import UsageClient
 from .assets import AssetsClient
 from .reports import ReportsClient
@@ -70,5 +70,5 @@ class CloudHealth(object):
         self.accounts = AccountsClient(self._client)
         self.reports = ReportsClient(self._client)
         self.assets = AssetsClient(self._client)
-        self.costs = CostsClient(self._client)
+        self.cost = CostClient(self._client)
         self.usage = UsageClient(self._client)

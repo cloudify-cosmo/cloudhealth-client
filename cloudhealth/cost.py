@@ -1,7 +1,7 @@
 from . import accounts
 
 
-class CostsClient(object):
+class CostClient(object):
     CURRENT_COST_URL = '/olap_reports/cost/current'
     HISTORY_COST_URL = '/olap_reports/cost/history'
 
@@ -18,7 +18,7 @@ class CostsClient(object):
             label = month['label']
             list_of_months.append(label.encode('ascii'))
 
-        print list_of_months
+        return list_of_months
 
     def get_current(self, account_name=None, account_type='AWS-Account'):
         response = self.client.get(self.CURRENT_COST_URL)
