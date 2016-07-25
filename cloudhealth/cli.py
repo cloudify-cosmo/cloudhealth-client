@@ -52,15 +52,15 @@ def cost(ctx):
 
 
 @cost.command('current')
-@click.option('-n',
-              '--account-name',
-              help='The account to get the cost for')
 @click.option('-t',
               '--account-type',
               default='AWS-Account',
               help='The type to get the cost for [default: AWS-Account]')
+@click.option('-n',
+              '--account-name',
+              help='The account to get the cost for')
 @click.pass_context
-def current_cost(ctx, account_name, account_type):
+def current_cost(ctx, account_type, account_name):
     """Retrieve current cost.
 
     Specifying an account name will get the current cost for that account only.
@@ -68,7 +68,34 @@ def current_cost(ctx, account_name, account_type):
     Omitting both will get the total cost of all accounts.
     """
     cost = ctx.obj['client']
-    print(cost.get_current(account_name, account_type))
+    print(cost.get_current(account_type, account_name))
+
+
+@cost.command('history')
+@click.option('-t',
+              '--account-type',
+              default='AWS-Account',
+              help='The type to get the cost for [default: AWS-Account]')
+@click.option('-n',
+              '--account-name',
+              default='Total'.encode('ascii'),
+              help='The account to get the cost for')
+@click.option('-m',
+              '--month',
+              help='Sum of cost for the last month [default: Last Month]')
+@click.pass_context
+def cost_history(ctx, account_type, account_name, month):
+    """Retrieve cost history.
+
+    Specifying an account name will get the current cost for that account only.
+    Specifying an account type will get the cost to all accounts of that type.
+    Omitting both will get the total cost of all accounts.
+    """
+    cost = ctx.obj['client']
+    if month:
+        print(cost.cost_history(account_type, account_name=account_name, month=month))
+    else:
+        print(cost.cost_history(account_type, account_name=account_name))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
