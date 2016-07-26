@@ -1,8 +1,4 @@
-from datetime import date, timedelta
-
-def _get_current_month():
-    current = date.today()
-    return date(current.year, current.month-1, current.day).strftime('%Y-%m')
+from . import utils
 
 class CostClient(object):
     CURRENT_COST_URL = '/olap_reports/cost/current'
@@ -42,8 +38,8 @@ class CostClient(object):
 
         list_of_aws_accounts = self.list_accounts(account_type)
 
-        costs = response['data']
-        for accounts_total in costs:
+        cost_response = response['data']
+        for accounts_total in cost_response:
             accounts_total_cost.append(accounts_total[0][0])
 
         cost_by_account = dict(zip(list_of_aws_accounts, accounts_total_cost))
@@ -55,25 +51,26 @@ class CostClient(object):
         else:
             return cost_by_account['Total']
 
-    def cost_history(self,
+    def history(self,
                      account_type='AWS-Account',
                      account_name='Total',
-                     month=_get_current_month()):
+                     month=utils._get_last_month()):
         response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL)
 
         accounts_cost_by_month = []
         list_of_months = self.list_months(self.ACCOUNTS_HISTORY_COST_URL)
         list_of_aws_accounts = self.list_accounts(account_type)
 
-        costs = response['data']
-        for list in costs:
+        cost_response = response['data']
+        for list in cost_response:
             costs_history_by_month = dict(zip(list_of_aws_accounts, list))
             accounts_cost_by_month.append(costs_history_by_month[account_name][0])
 
-        costs_history_for_account = dict(zip(list_of_months,
+        cost_history_for_account = dict(zip(list_of_months,
                                              accounts_cost_by_month))
 
-        if month == 'all':
-            return costs_history_for_account
-        else:
-            return costs_history_for_account[month]
+        return cost_history_for_account
+        # if month == 'all':
+        #     return costs_history_for_account
+        # else:
+        #     return costs_history_for_account[month]

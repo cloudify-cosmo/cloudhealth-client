@@ -17,7 +17,7 @@ import click
 
 from click_didyoumean import DYMGroup
 
-from cloudhealth import client
+from cloudhealth import client, utils
 
 
 CLICK_CONTEXT_SETTINGS = dict(
@@ -84,18 +84,20 @@ def current_cost(ctx, account_type, account_name):
               '--month',
               help='Sum of cost for the last month [default: Last Month]')
 @click.pass_context
-def cost_history(ctx, account_type, account_name, month):
+def history(ctx, account_type, account_name, month):
     """Retrieve cost history.
 
-    Specifying an account name will get the current cost for that account only.
+    Specifying an account name will get the cost for the previous month.
     Specifying an account type will get the cost to all accounts of that type.
-    Omitting both will get the total cost of all accounts.
+    Omitting both will get the total cost for previous month.
     """
     cost = ctx.obj['client']
-    if month:
-        print(cost.cost_history(account_type, account_name=account_name, month=month))
+    if month == 'all':
+        print(cost.history(account_type, account_name=account_name))
+    elif month:
+        print(cost.history(account_type, account_name=account_name, month=month))
     else:
-        print(cost.cost_history(account_type, account_name=account_name))
+        print(cost.history(account_type, account_name=account_name, month=utils._get_last_month))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
@@ -116,8 +118,7 @@ def get_usage(ctx, resource_type, date):
     """Retrieve usage statistics by day and resource type.
 
     Specifying Date will get you the usage for that day.
-    Specifying Resource type will get you the usage for a particular resources
-    by date.
+    Specifying Resource type will get you the usage for a particular resources by date.
     Omitting date will get you the usage for yesterday.
     """
     usage = ctx.obj['client']
