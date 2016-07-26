@@ -52,23 +52,73 @@ def cost(ctx):
 
 
 @cost.command('current')
-@click.option('-n',
-              '--account-name',
-              help='The account to get the cost for')
 @click.option('-t',
               '--account-type',
               default='AWS-Account',
               help='The type to get the cost for [default: AWS-Account]')
+@click.option('-n',
+              '--account-name',
+              help='The account to get the cost for')
 @click.pass_context
-def current_cost(ctx, account_name, account_type):
+def current_cost(ctx, account_type, account_name):
     """Retrieve current cost.
 
-    Specifying an account name will get the current cost for that account only.
+    Specifying an account name will get the current cost for that account only
     Specifying an account type will get the cost to all accounts of that type.
     Omitting both will get the total cost of all accounts.
     """
     cost = ctx.obj['client']
-    print(cost.get_current(account_name, account_type))
+    print(cost.get_current(account_type, account_name))
+
+
+@cost.command('history')
+@click.option('--history-report-id',
+              # required=True,
+              envvar='CLOUDHEALTH_HISTORY_REPORT_ID',
+              help='Cloudhealth history reports ID Number')
+@click.option('-t',
+              '--account-type',
+              default='AWS-Account',
+              help='The type to get the cost for [default: AWS-Account]')
+@click.option('-n',
+              '--account-name',
+              default='Total'.encode('ascii'),
+              help='The account to get the cost for')
+@click.option('-s',
+              '--service',
+              default='Total'.encode('ascii'),
+              help='The service cost')
+@click.option('-m',
+              '--month',
+              help='Sum of cost for the last month [default: Last Month]')
+@click.pass_context
+def cost_history(ctx, history_report_id, account_type, account_name, service, month):
+    """Retrieve Cost History.
+
+    You must create a report to reflect your various accounts.
+    In "Cost History", change the category from "Service Item" to "Accounts".
+    Save the report and use the ID from the url as `--history_report_id`
+
+    You can set the `CLOUDHEALTH_HISTORY_REPORT_ID` environment variable instead
+    of using the `--history-report-id` everytime.
+
+    Specifying an account name will get the cost history for that account only for previous month.
+    Specifying an account name and month will get the cost history for month and account.
+    Specifying an account type will get the cost to all accounts of that type.
+    Omitting all will get the cost history of all accounts for previous month.
+    """
+    cost = ctx.obj['client']
+    if month:
+        print(cost.cost_history(history_report_id,
+                                account_type,
+                                account_name=account_name,
+                                service=service,
+                                month=month))
+    else:
+        print(cost.cost_history(history_report_id,
+                                account_type,
+                                account_name=account_name,
+                                service=service))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
