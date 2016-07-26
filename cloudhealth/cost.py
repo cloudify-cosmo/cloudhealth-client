@@ -73,4 +73,7 @@ class CostClient(object):
         costs_history_for_account = dict(zip(list_of_months,
                                              accounts_cost_by_month))
 
-        return costs_history_for_account[month]
+        if month == 'all':
+            return costs_history_for_account
+        else:
+            return costs_history_for_account[month]
