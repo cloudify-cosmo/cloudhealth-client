@@ -68,7 +68,11 @@ def current_cost(ctx, account_type, account_name):
     Omitting both will get the total cost of all accounts.
     """
     cost = ctx.obj['client']
-    print(cost.get_current(account_type, account_name))
+    if account_name:
+        print(cost.get_current(account_type, account_name)[account_name])
+    else:
+        print(cost.get_current(account_type, account_name))
+
 
 
 @cost.command('history')
@@ -82,6 +86,7 @@ def current_cost(ctx, account_type, account_name):
               help='The account to get the cost for')
 @click.option('-m',
               '--month',
+              default=utils._get_last_month,
               help='Sum of cost for the last month [default: Last Month]')
 @click.pass_context
 def history(ctx, account_type, account_name, month):
@@ -95,7 +100,7 @@ def history(ctx, account_type, account_name, month):
     if month == 'all':
         print(cost.history(account_type, account_name=account_name))
     elif month:
-        print(cost.history(account_type, account_name=account_name, month=month))
+        print(cost.history(account_type, account_name=account_name, month=month)[month])
     else:
         print(cost.history(account_type, account_name=account_name, month=utils._get_last_month))
 
@@ -112,6 +117,7 @@ def usage(ctx):
 @click.argument('resource-type')
 @click.option('-d',
               '--date',
+              default=utils._get_yesterdays_date,
               help='Resource usage per day [defaults to yesterday]')
 @click.pass_context
 def get_usage(ctx, resource_type, date):
@@ -122,14 +128,12 @@ def get_usage(ctx, resource_type, date):
     Omitting date will get you the usage for yesterday.
     """
     usage = ctx.obj['client']
-    if date and resource_type:
+    if date == 'all':
         print(usage.get(resource_type=resource_type, date=date))
-    elif resource_type:
-        print(usage.get(resource_type=resource_type))
     elif date:
-        print(usage.get(date=date))
+        print(usage.get(resource_type=resource_type, date=date)[date])
     else:
-        print(usage.get())
+        print(usage.get(resource_type=resource_type, date=utils._get_yesterdays_date))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
