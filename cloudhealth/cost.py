@@ -1,4 +1,4 @@
-from . import utils
+import itertools
 
 class CostClient(object):
     CURRENT_COST_URL = '/olap_reports/cost/current'
@@ -82,7 +82,7 @@ class CostClient(object):
 
         return cost_history_for_account
 
-    def service_history(self,
+    def per_service_history(self,
                     account_type,
                     service,
                     month=None):
@@ -94,10 +94,30 @@ class CostClient(object):
         fetch_services = self.list_service()
 
         cost_response = response['data']
+
         for called_service in cost_response:
             service_cost_history_by_month = dict(zip(fetch_services, called_service))
             service_cost_by_month.append(service_cost_history_by_month[service][0])
 
+
         cost_history_for_service = dict(zip(list_of_months,
                                             service_cost_by_month))
         return cost_history_for_service
+
+    def services_history(self,
+                            account_type,
+                            service,
+                            month=None):
+        response = self.client.get(self.HISTORY_COST_URL)
+
+        list_of_months = self.list_months(self.HISTORY_COST_URL)
+        asked_month = list_of_months.index(month)
+
+        fetch_services = self.list_service()
+
+        cost_response = response['data']
+        cost_of_month = list(itertools.chain(*cost_response[asked_month]))
+
+        service_cost_history_by_month = dict(zip(fetch_services, cost_of_month))
+
+        return service_cost_history_by_month

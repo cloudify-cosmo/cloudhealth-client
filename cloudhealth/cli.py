@@ -13,6 +13,7 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
+import re
 import click
 
 from click_didyoumean import DYMGroup
@@ -118,7 +119,6 @@ def accounts_history(ctx, account_type, account_name, month):
               help='The type to get the cost for [default: AWS-Account]')
 @click.option('-s',
               '--service',
-              default='Amazon Elastic Compute Cloud - Direct'.encode('ascii'),
               help='The account to get the cost for')
 @click.option('-m',
               '--month',
@@ -134,23 +134,21 @@ def service_history(ctx, account_type, service, month):
     """
     cost = ctx.obj['client']
 
-    # print 'service:' + service
-    # print 'month:' + month
-
     if service:
-        print 'service'
-        print(cost.service_history(account_type,
-                                   service=service.encode('ascii'),
-                                   month=month))
+        print(cost.per_service_history(account_type,
+                                   service=service,
+                                   month=utils._get_last_month))
+    elif month:
+        print(cost.services_history(account_type,
+                                       service,
+                                       month=month))
     elif service and month:
-        print 'mount and service'
-        print(cost.service_history(account_type,
+        print(cost.per_service_history(account_type,
                                    service=service,
                                    month=month))
     else:
-        print 'else'
-        print(cost.service_history(account_type,
-                                   service=service,
+        print(cost.services_history(account_type,
+                                   service,
                                    month=utils._get_last_month))
 
 
