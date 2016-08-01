@@ -61,10 +61,10 @@ class CostClient(object):
 
         return cost_by_account
 
-    def accounts_history(self,
-                     account_type='AWS-Account',
-                     account_name='Total',
-                     month=None):
+    def account_history(self,
+                         account_type='AWS-Account',
+                         account_name='Total',
+                         month=None):
         response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL)
 
         list_of_months = self.list_months(self.HISTORY_COST_URL)
@@ -82,10 +82,10 @@ class CostClient(object):
 
         return cost_history_for_account
 
-    def per_service_history(self,
-                    account_type,
-                    service,
-                    month=None):
+    def service_history(self,
+                            account_type,
+                            service,
+                            month=None):
         response = self.client.get(self.HISTORY_COST_URL)
 
         list_of_months = self.list_months(self.HISTORY_COST_URL)
@@ -105,9 +105,9 @@ class CostClient(object):
         return cost_history_for_service
 
     def services_history(self,
-                            account_type,
-                            service,
-                            month=None):
+                        account_type,
+                        service,
+                        month=None):
         response = self.client.get(self.HISTORY_COST_URL)
 
         list_of_months = self.list_months(self.HISTORY_COST_URL)

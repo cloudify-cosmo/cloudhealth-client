@@ -90,7 +90,7 @@ def current_cost(ctx, account_type, account_name):
               default=utils._get_last_month,
               help='Sum of cost for the last month [default: Last Month]')
 @click.pass_context
-def accounts_history(ctx, account_type, account_name, month):
+def account_history(ctx, account_type, account_name, month):
     """Retrieve cost history.
 
     Specifying an account name will get the cost for the previous month.
@@ -99,15 +99,15 @@ def accounts_history(ctx, account_type, account_name, month):
     """
     cost = ctx.obj['client']
     if month == 'all':
-        print cost.accounts_history(account_type,
+        print cost.account_history(account_type,
                                     account_name=account_name,
                                     month=month)
     elif month:
-        print(cost.accounts_history(account_type,
+        print(cost.account_history(account_type,
                                     account_name=account_name,
                                     month=month)[month])
     else:
-        print(cost.accounts_history(account_type,
+        print(cost.account_history(account_type,
                                     account_name=account_name,
                                     month=utils._get_last_month))
 
