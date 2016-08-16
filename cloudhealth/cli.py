@@ -76,21 +76,13 @@ def current_cost(ctx, account_type, account_name):
 
 
 
-@cost.command('accounts-history')
+@cost.command('account-history')
 @click.option('-t',
               '--account-type',
               default='AWS-Account',
               help='The type to get the cost for [default: AWS-Account]')
-@click.option('-n',
-              '--account-name',
-              default='Total'.encode('ascii'),
-              help='The account to get the cost for')
-@click.option('-m',
-              '--month',
-              default=utils._get_last_month,
-              help='Sum of cost for the last month [default: Last Month]')
 @click.pass_context
-def account_history(ctx, account_type, account_name, month):
+def account_history(ctx, account_type):
     """Retrieve cost history.
 
     Specifying an account name will get the cost for the previous month.
@@ -98,18 +90,7 @@ def account_history(ctx, account_type, account_name, month):
     Omitting both will get the total cost for previous month.
     """
     cost = ctx.obj['client']
-    if month == 'all':
-        print cost.account_history(account_type,
-                                    account_name=account_name,
-                                    month=month)
-    elif month:
-        print(cost.account_history(account_type,
-                                    account_name=account_name,
-                                    month=month)[month])
-    else:
-        print(cost.account_history(account_type,
-                                    account_name=account_name,
-                                    month=utils._get_last_month))
+    print(cost.account_history(account_type))
 
 
 @cost.command('service-history')

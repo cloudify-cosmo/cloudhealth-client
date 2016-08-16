@@ -62,25 +62,22 @@ class CostClient(object):
         return cost_by_account
 
     def account_history(self,
-                         account_type='AWS-Account',
-                         account_name='Total',
-                         month=None):
+                         account_type='AWS-Account'):
         response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL)
 
         list_of_months = self.list_months(self.HISTORY_COST_URL)
-
-        accounts_cost_by_month = []
         list_of_accounts = self.list_accounts(account_type)
 
+        accounts_history = {}
+
         cost_response = response['data']
-        for month_cost in cost_response:
-            accounts_cost_history_by_month = dict(zip(list_of_accounts, month_cost))
-            accounts_cost_by_month.append(accounts_cost_history_by_month[account_name][0])
+        for month_cost, each_month in zip(cost_response, list_of_months):
+            accounts_cost_history_by_month = dict(zip(list_of_accounts, sum(month_cost, [])))
+            months_total = {each_month: accounts_cost_history_by_month}
+            for key, value in months_total.iteritems():
+                accounts_history[key] = value
 
-        cost_history_for_account = dict(zip(list_of_months,
-                                            accounts_cost_by_month))
-
-        return cost_history_for_account
+        return accounts_history
 
     def service_history(self,
                             account_type,
