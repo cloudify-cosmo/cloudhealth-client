@@ -17,7 +17,7 @@ import click
 
 from click_didyoumean import DYMGroup
 
-from cloudhealth import client
+from cloudhealth import client, utils
 
 
 CLICK_CONTEXT_SETTINGS = dict(
@@ -52,15 +52,15 @@ def cost(ctx):
 
 
 @cost.command('current')
-@click.option('-n',
-              '--account-name',
-              help='The account to get the cost for')
 @click.option('-t',
               '--account-type',
               default='AWS-Account',
               help='The type to get the cost for [default: AWS-Account]')
+@click.option('-n',
+              '--account-name',
+              help='The account to get the cost for')
 @click.pass_context
-def current_cost(ctx, account_name, account_type):
+def current_cost(ctx, account_type, account_name):
     """Retrieve current cost.
 
     Specifying an account name will get the current cost for that account only.
@@ -68,7 +68,83 @@ def current_cost(ctx, account_name, account_type):
     Omitting both will get the total cost of all accounts.
     """
     cost = ctx.obj['client']
-    print(cost.get_current(account_name, account_type))
+    if account_name:
+        print(cost.get_current(account_type, account_name)[account_name])
+    else:
+        print(cost.get_current(account_type, account_name))
+
+
+
+@cost.command('account-history')
+@click.option('-t',
+              '--account-type',
+              default='AWS-Account',
+              help='The type to get the cost for [default: AWS-Account]')
+@click.option('-n',
+              '--account-name',
+              help='The account to get the cost for')
+@click.option('-m',
+              '--month',
+              # default=utils._get_last_month,
+              help='Sum of cost for the last month [default: Last Month]')
+@click.pass_context
+def account_history(ctx, account_type, account_name, month):
+    """Retrieve cost history.
+
+    Specifying an account name will get the cost for the previous month.
+    Specifying an account type will get the cost to all accounts of that type.
+    Omitting both will get the total cost for previous month.
+    """
+    cost = ctx.obj['client']
+    if account_name:
+        full_history = cost.account_history(account_type)
+        for each_month, account in full_history.iteritems():
+            print each_month, account[account_name]
+    elif month:
+        full_history = cost.account_history(account_type)[month]
+        for name, amount in full_history.iteritems():
+            print name, amount
+    else:
+        full_history = cost.account_history(account_type)
+        print(utils._format_json(full_history))
+
+
+@cost.command('service-history')
+@click.option('-t',
+              '--account-type',
+              default='AWS-Account',
+              help='The type to get the cost for [default: AWS-Account]')
+@click.option('-s',
+              '--service',
+              help='The service to get the cost for')
+@click.option('-m',
+              '--month',
+              # default=utils._get_last_month,
+              help='Sum of cost for the last month [default: Last Month]')
+@click.pass_context
+def service_history(ctx, account_type, service, month):
+    """Retrieve cost history.
+
+    Specifying an account name will get the cost for the previous month.
+    Specifying an account type will get the cost to all accounts of that type.
+    Omitting both will get the total cost for previous month.
+    """
+    cost = ctx.obj['client']
+    if month and service:
+        full_history = cost.service_history()[month]
+        print service, full_history[service]
+    elif service:
+        full_history = cost.service_history()
+        for each_month, service_cost in full_history.iteritems():
+            print each_month, service_cost[service]
+    elif month:
+        full_history = cost.service_history()[month]
+        for each_month, service_cost in full_history.iteritems():
+            print each_month, service_cost
+    else:
+        full_history = cost.service_history()
+        print(utils._format_json(full_history))
+
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
@@ -83,25 +159,23 @@ def usage(ctx):
 @click.argument('resource-type')
 @click.option('-d',
               '--date',
+              default=utils._get_yesterdays_date,
               help='Resource usage per day [defaults to yesterday]')
 @click.pass_context
 def get_usage(ctx, resource_type, date):
     """Retrieve usage statistics by day and resource type.
 
     Specifying Date will get you the usage for that day.
-    Specifying Resource type will get you the usage for a particular resources
-    by date.
+    Specifying Resource type will get you the usage for a particular resources by date.
     Omitting date will get you the usage for yesterday.
     """
     usage = ctx.obj['client']
-    if date and resource_type:
+    if date == 'all':
         print(usage.get(resource_type=resource_type, date=date))
-    elif resource_type:
-        print(usage.get(resource_type=resource_type))
     elif date:
-        print(usage.get(date=date))
+        print(usage.get(resource_type=resource_type, date=date)[date])
     else:
-        print(usage.get())
+        print(usage.get(resource_type=resource_type, date=utils._get_yesterdays_date))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)

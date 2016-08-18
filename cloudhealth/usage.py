@@ -1,9 +1,4 @@
-from datetime import date, timedelta
-
-
-def _get_yesterdays_date():
-    return (date.today() - timedelta(1)).strftime('%Y-%m-%d')
-
+from . import utils
 
 class UsageClient(object):
     USAGE_URL = 'olap_reports/usage'
@@ -24,7 +19,7 @@ class UsageClient(object):
 
         return list_of_days
 
-    def get(self, resource_type, date=_get_yesterdays_date()):
+    def get(self, resource_type, date=utils._get_yesterdays_date()):
         uri = self.USAGE_URL + '/' + resource_type
         response = self.client.get(uri)
 
@@ -38,4 +33,4 @@ class UsageClient(object):
 
         usage_for_day = dict(zip(list_of_days, total_usage))
 
-        return usage_for_day[date]
+        return usage_for_day
