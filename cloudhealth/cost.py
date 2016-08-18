@@ -94,21 +94,3 @@ class CostClient(object):
                 service_cost_by_month[key] = value
 
         return service_cost_by_month
-
-    def services_history(self,
-                        account_type,
-                        service,
-                        month=None):
-        response = self.client.get(self.HISTORY_COST_URL)
-
-        list_of_months = self.list_months(self.HISTORY_COST_URL)
-        asked_month = list_of_months.index(month)
-
-        fetch_services = self.list_service()
-
-        cost_response = response['data']
-        cost_of_month = list(itertools.chain(*cost_response[asked_month]))
-
-        service_cost_history_by_month = dict(zip(fetch_services, cost_of_month))
-
-        return service_cost_history_by_month
