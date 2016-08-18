@@ -33,6 +33,7 @@ class CostClient(object):
         return list_of_accounts
 
     def list_service(self):
+
         response = self.client.get(self.HISTORY_COST_URL)
 
         list_of_services = []
@@ -44,7 +45,6 @@ class CostClient(object):
 
 
         return list_of_services
-
 
     def get_current(self, account_type='AWS-Account', account_name=None):
         response = self.client.get(self.CURRENT_COST_URL)

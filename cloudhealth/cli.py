@@ -61,7 +61,7 @@ def cost(ctx):
               help='The account to get the cost for')
 @click.pass_context
 def current_cost(ctx, account_type, account_name):
-    """Retrieve current cost.
+    """Retrieve current cost for all accounts.
 
     Specifying an account name will get the current cost for that account only.
     Specifying an account type will get the cost to all accounts of that type.
@@ -89,14 +89,17 @@ def current_cost(ctx, account_type, account_name):
               help='Sum of cost for the last month [default: Last Month]')
 @click.pass_context
 def account_history(ctx, account_type, account_name, month):
-    """Retrieve cost history.
+    """Retrieve cost history by account.
 
     Specifying an account name will get the cost for the previous month.
     Specifying an account type will get the cost to all accounts of that type.
     Omitting both will get the total cost for previous month.
     """
     cost = ctx.obj['client']
-    if account_name:
+    if account_name and month:
+        full_history = cost.account_history(account_type)[month]
+        print full_history[account_name]
+    elif account_name:
         full_history = cost.account_history(account_type)
         for each_month, account in full_history.iteritems():
             print each_month, account[account_name]
@@ -123,11 +126,11 @@ def account_history(ctx, account_type, account_name, month):
               help='Sum of cost for the last month [default: Last Month]')
 @click.pass_context
 def service_history(ctx, account_type, service, month):
-    """Retrieve cost history.
+    """Retrieve cost history by service.
 
-    Specifying an account name will get the cost for the previous month.
-    Specifying an account type will get the cost to all accounts of that type.
-    Omitting both will get the total cost for previous month.
+    Specifying a service will get the cost for the previous month.
+    Specifying a service and month will get the cost for the month and service.
+    Omitting both will get a dict of services cost for previous month.
     """
     cost = ctx.obj['client']
     if month and service:
