@@ -1,3 +1,4 @@
+import json
 import calendar
 from datetime import date, timedelta
 
@@ -15,3 +16,6 @@ def _get_last_month():
         return date(current.year, current.month-1, (calendar.monthrange(current.year, current.month-1)[1])).strftime('%Y-%m')
     else:
         return date(current.year, current.month-1, current.day).strftime('%Y-%m')
+
+def _format_json(dictionary):
+    return json.dumps(dictionary, indent=4, sort_keys=True)
