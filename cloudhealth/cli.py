@@ -71,7 +71,7 @@ def current_cost(ctx, account_type, account_name):
     if account_name:
         print(cost.get_current(account_type, account_name)[account_name])
     else:
-        print(cost.get_current(account_type, account_name))
+        print(utils._format_json(cost.get_current(account_type, account_name)))
 
 
 
