@@ -1,3 +1,4 @@
+import re
 from . import utils
 
 class UsageClient(object):
@@ -18,6 +19,17 @@ class UsageClient(object):
             list_of_days.append(label.encode('ascii'))
 
         return list_of_days
+
+    def list_services(self, account_type):
+        uri = self.USAGE_URL
+        response = self.client.get(uri)
+
+        list_pf_services = []
+
+        for items in response['links']:
+            list_pf_services.append(re.sub('usage/', '', items))
+
+        return list_pf_services
 
     def get(self, resource_type, date=utils._get_yesterdays_date()):
         uri = self.USAGE_URL + '/' + resource_type

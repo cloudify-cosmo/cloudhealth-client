@@ -51,6 +51,30 @@ def cost(ctx):
     ctx.obj['client'] = ctx.obj['client'].cost
 
 
+@cost.command('list')
+@click.option('-t',
+              '--account-type',
+              default='AWS-Account',
+              help='Type of accounts to list [default: AWS-Account]')
+@click.option('-r',
+              '--resource-type',
+              default='accounts',
+              help='Resource type to list')
+@click.pass_context
+def list(ctx, account_type, resource_type):
+    """List possible objects for cost function.
+
+    List all accounts, services and dates.
+    """
+    cost = ctx.obj['client']
+    if resource_type == 'accounts':
+        print(utils._format_json(cost.list_accounts(account_type)))
+    elif resource_type == 'services':
+        print(utils._format_json(cost.list_service()))
+    elif resource_type == 'dates':
+        print(utils._format_json(cost.list_months(account_type)))
+
+
 @cost.command('current')
 @click.option('-t',
               '--account-type',
@@ -157,6 +181,17 @@ def usage(ctx):
     """
     ctx.obj['client'] = ctx.obj['client'].usage
 
+@usage.command('list')
+@click.option('-t',
+              '--account-type',
+              default='AWS-Account',
+              help='The type to get the cost for [default: AWS-Account]')
+@click.pass_context
+def list_services(ctx, account_type):
+    """Retrieve list of usage resources
+    """
+    usage = ctx.obj['client']
+    print(utils._format_json(usage.list_services(account_type)))
 
 @usage.command('get')
 @click.argument('resource-type')

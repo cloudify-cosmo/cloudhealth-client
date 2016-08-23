@@ -1,14 +1,21 @@
 import json
 import calendar
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 def _get_yesterdays_date():
     current = date.today()
+    current_time = datetime.utcnow()
     if current.day == 1:
-        return date(current.year, current.month-1, (calendar.monthrange(current.year, current.month-1)[1])).strftime('%Y-%m-%d')
+        if current_time.hour <= 7:
+            return date(current.year, current.month-1, (calendar.monthrange(current.year, current.month-1)[2])).strftime('%Y-%m-%d')
+        else:
+            return date(current.year, current.month-1, (calendar.monthrange(current.year, current.month-1)[1])).strftime('%Y-%m-%d')
     else:
-        return date(current.year, current.month, current.day-1).strftime('%Y-%m-%d')
+        if current_time.hour <= 7:
+            return date(current.year, current.month, current.day-2).strftime('%Y-%m-%d')
+        else:
+            return date(current.year, current.month, current.day-1).strftime('%Y-%m-%d')
 
 def _get_last_month():
     current = date.today()
