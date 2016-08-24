@@ -1,5 +1,3 @@
-import itertools
-
 class CostClient(object):
     CURRENT_COST_URL = '/olap_reports/cost/current'
     HISTORY_COST_URL = '/olap_reports/cost/history'
@@ -60,6 +58,21 @@ class CostClient(object):
         cost_by_account = dict(zip(list_of_aws_accounts, accounts_total_cost))
 
         return cost_by_account
+
+    def get_current_by_services(self, account_type='AWS-Account'):
+        response = self.client.get(self.CURRENT_COST_URL)
+
+        services_total_cost = []
+
+        list_of_services = self.list_service()
+
+        cost_response = response['data']
+        for services_total in cost_response[0]:
+            services_total_cost.append(services_total[0])
+
+        cost_by_service = dict(zip(list_of_services, services_total_cost))
+
+        return cost_by_service
 
     def account_history(self, account_type='AWS-Account'):
         response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL)

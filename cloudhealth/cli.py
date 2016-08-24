@@ -80,11 +80,16 @@ def list(ctx, account_type, resource_type):
               '--account-type',
               default='AWS-Account',
               help='The type to get the cost for [default: AWS-Account]')
+@click.option('-S',
+              '--by-service',
+              default=False,
+              is_flag=True,
+              help='Get current cost by service')
 @click.option('-n',
               '--account-name',
               help='The account to get the cost for')
 @click.pass_context
-def current_cost(ctx, account_type, account_name):
+def current_cost(ctx, account_type, by_service, account_name):
     """Retrieve current cost for all accounts.
 
     Specifying an account name will get the current cost for that account only.
@@ -92,7 +97,9 @@ def current_cost(ctx, account_type, account_name):
     Omitting both will get the total cost of all accounts.
     """
     cost = ctx.obj['client']
-    if account_name:
+    if by_service:
+        print(utils._format_json(cost.get_current_by_services()))
+    elif account_name:
         print(cost.get_current(account_type, account_name)[account_name])
     else:
         print(utils._format_json(cost.get_current(account_type, account_name)))
