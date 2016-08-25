@@ -90,14 +90,17 @@ def list(ctx, account_type, resource_type):
               help='The account to get the cost for')
 @click.option('-id',
               '--report_id',
-              help='Get current cost of prespective group from report')
+              help='Get current cost of perspective group from a report This only works in 2 dimensions reports')
 @click.pass_context
 def current_cost(ctx, account_type, by_service, account_name, report_id):
     """Retrieve current cost for all accounts.
 
+    Using the -S flag will get you a list of current services costs.
     Specifying an account name will get the current cost for that account only.
     Specifying an account type will get the cost to all accounts of that type.
     Omitting both will get the total cost of all accounts.
+
+    Specifying a report id will get you the current cost based on filter and grouping done in web console
     """
     cost = ctx.obj['client']
     if by_service:
@@ -105,7 +108,7 @@ def current_cost(ctx, account_type, by_service, account_name, report_id):
     elif account_name:
         print(cost.get_current_by_accounts(account_type, account_name)[account_name])
     elif report_id:
-        print(cost.get_custom_report(report_id))
+        print(utils._format_json(cost.get_custom_report(report_id)))
     else:
         print(utils._format_json(cost.get_current_by_accounts(account_type, account_name)))
 
