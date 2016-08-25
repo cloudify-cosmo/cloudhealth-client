@@ -88,8 +88,11 @@ def list(ctx, account_type, resource_type):
 @click.option('-n',
               '--account-name',
               help='The account to get the cost for')
+@click.option('-id',
+              '--report_id',
+              help='Get current cost of prespective group from report')
 @click.pass_context
-def current_cost(ctx, account_type, by_service, account_name):
+def current_cost(ctx, account_type, by_service, account_name, report_id):
     """Retrieve current cost for all accounts.
 
     Specifying an account name will get the current cost for that account only.
@@ -100,9 +103,11 @@ def current_cost(ctx, account_type, by_service, account_name):
     if by_service:
         print(utils._format_json(cost.get_current_by_services()))
     elif account_name:
-        print(cost.get_current(account_type, account_name)[account_name])
+        print(cost.get_current_by_accounts(account_type, account_name)[account_name])
+    elif report_id:
+        print(cost.get_custom_report(report_id))
     else:
-        print(utils._format_json(cost.get_current(account_type, account_name)))
+        print(utils._format_json(cost.get_current_by_accounts(account_type, account_name)))
 
 
 

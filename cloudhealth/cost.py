@@ -1,6 +1,9 @@
+import re
+
 class CostClient(object):
     CURRENT_COST_URL = '/olap_reports/cost/current'
     HISTORY_COST_URL = '/olap_reports/cost/history'
+    CUSTOM_REPORT_URL = '/olap_reports/custom/'
     ACCOUNTS_HISTORY_COST_URL = '/olap_reports/custom/893353198679'
 
     def __init__(self, client):
@@ -44,7 +47,23 @@ class CostClient(object):
 
         return list_of_services
 
-    def get_current(self, account_type='AWS-Account', account_name=None):
+    def list_groups(self, report_id):
+
+        response = self.client.get(self.CUSTOM_REPORT_URL + report_id)
+
+        list_of_groups = []
+        for group_name in response['dimensions'][0]:
+            pass
+        group_list = response['dimensions'][0][group_name]
+
+        for service in group_list:
+            label = service['label']
+            list_of_groups.append(label.encode('ascii'))
+
+
+        return list_of_groups
+
+    def get_current_by_accounts(self, account_type='AWS-Account', account_name=None):
         response = self.client.get(self.CURRENT_COST_URL)
 
         accounts_total_cost = []
@@ -107,3 +126,17 @@ class CostClient(object):
                 service_cost_by_month[key] = value
 
         return service_cost_by_month
+
+    def get_custom_report(self, report_id):
+        response = self.client.get(self.CUSTOM_REPORT_URL + report_id)
+
+        groups_cost = []
+        groups_names = self.list_groups(report_id)
+
+        cost_response = response['data']
+        for group_total in cost_response:
+            groups_cost.append(group_total[0])
+
+        cost_by_group = dict(zip(groups_names, groups_cost))
+
+        return cost_by_group
