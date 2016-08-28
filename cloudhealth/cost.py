@@ -1,13 +1,24 @@
-import re
-
 class CostClient(object):
     CURRENT_COST_URL = '/olap_reports/cost/current'
+    INSTANCE_COST_URL = '/olap_reports/cost/current/instance'
     HISTORY_COST_URL = '/olap_reports/cost/history'
     CUSTOM_REPORT_URL = '/olap_reports/custom/'
     ACCOUNTS_HISTORY_COST_URL = '/olap_reports/custom/893353198679'
 
     def __init__(self, client):
         self.client = client
+
+    def list_days(self, type):
+        response = self.client.get(self.INSTANCE_COST_URL)
+
+        list_of_days = []
+        days = response['dimensions'][0]["time"]
+
+        for day in days:
+            label = day['label']
+            list_of_days.append(label.encode('ascii'))
+
+        return list_of_days
 
     def list_months(self, type):
         response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL)
@@ -92,6 +103,21 @@ class CostClient(object):
         cost_by_service = dict(zip(list_of_services, services_total_cost))
 
         return cost_by_service
+
+    def get_cost_for_instances(self):
+        response = self.client.get(self.INSTANCE_COST_URL)
+
+        instace_total_cost = []
+
+        list_of_days = self.list_days(self.INSTANCE_COST_URL)
+
+        cost_response = response['data']
+        for instance_cost in cost_response:
+            instace_total_cost.append(instance_cost[0][0])
+
+        cost_by_day = dict(zip(list_of_days, instace_total_cost))
+
+        return cost_by_day
 
     def account_history(self, account_type='AWS-Account'):
         response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL)

@@ -85,6 +85,11 @@ def list(ctx, account_type, resource_type):
               default=False,
               is_flag=True,
               help='Get current cost by service')
+@click.option('-i',
+              '--instance',
+              default=False,
+              is_flag=True,
+              help='Get current cost for instances only')
 @click.option('-n',
               '--account-name',
               help='The account to get the cost for')
@@ -92,7 +97,7 @@ def list(ctx, account_type, resource_type):
               '--report_id',
               help='Get current cost of perspective group from a report This only works in 2 dimensions reports')
 @click.pass_context
-def current_cost(ctx, account_type, by_service, account_name, report_id):
+def current_cost(ctx, account_type, by_service, instance, account_name, report_id):
     """Retrieve current cost for all accounts.
 
     Using the -S flag will get you a list of current services costs.
@@ -105,10 +110,12 @@ def current_cost(ctx, account_type, by_service, account_name, report_id):
     cost = ctx.obj['client']
     if by_service:
         print(utils._format_json(cost.get_current_by_services()))
-    elif account_name:
-        print(cost.get_current_by_accounts(account_type, account_name)[account_name])
+    elif instance:
+        print(cost.get_cost_for_instances())[utils._get_yesterdays_date()]
     elif report_id:
         print(utils._format_json(cost.get_custom_report(report_id)))
+    elif account_name:
+        print(cost.get_current_by_accounts(account_type, account_name)[account_name])
     else:
         print(utils._format_json(cost.get_current_by_accounts(account_type, account_name)))
 
@@ -156,6 +163,11 @@ def account_history(ctx, account_type, account_name, month):
               '--account-type',
               default='AWS-Account',
               help='The type to get the cost for [default: AWS-Account]')
+@click.option('-i',
+              '--instance',
+              default=False,
+              is_flag=True,
+              help='Get current cost for instances only')
 @click.option('-s',
               '--service',
               help='The service to get the cost for')
@@ -164,7 +176,7 @@ def account_history(ctx, account_type, account_name, month):
               # default=utils._get_last_month,
               help='Sum of cost for the last month [default: Last Month]')
 @click.pass_context
-def service_history(ctx, account_type, service, month):
+def service_history(ctx, account_type, service, month, instance):
     """Retrieve cost history by service.
 
     Specifying a service will get the cost for the previous month.
@@ -183,6 +195,8 @@ def service_history(ctx, account_type, service, month):
         full_history = cost.service_history()[month]
         for each_month, service_cost in full_history.iteritems():
             print each_month, service_cost
+    elif instance:
+        print(utils._format_json(cost.get_cost_for_instances()))
     else:
         full_history = cost.service_history()
         print(utils._format_json(full_history))
