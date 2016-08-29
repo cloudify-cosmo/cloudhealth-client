@@ -8,7 +8,7 @@ class CostClient(object):
     def __init__(self, client):
         self.client = client
 
-    def list_days(self, type):
+    def list_days(self):
         response = self.client.get(self.INSTANCE_COST_URL)
 
         list_of_days = []
@@ -16,7 +16,7 @@ class CostClient(object):
 
         for day in days:
             label = day['label']
-            list_of_days.append(label.encode('ascii'))
+            list_of_days.append(label)
 
         return list_of_days
 
@@ -109,7 +109,7 @@ class CostClient(object):
 
         instace_total_cost = []
 
-        list_of_days = self.list_days(self.INSTANCE_COST_URL)
+        list_of_days = self.list_days()
 
         cost_response = response['data']
         for instance_cost in cost_response:

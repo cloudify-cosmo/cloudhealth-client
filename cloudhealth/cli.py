@@ -108,10 +108,10 @@ def current_cost(ctx, account_type, by_service, instance, account_name, report_i
     Specifying a report id will get you the current cost based on filter and grouping done in web console
     """
     cost = ctx.obj['client']
-    if by_service:
-        print(utils._format_json(cost.get_current_by_services()))
-    elif instance:
+    if instance:
         print(cost.get_cost_for_instances())[utils._get_yesterdays_date()]
+    elif by_service:
+        print(utils._format_json(cost.get_current_by_services()))
     elif report_id:
         print(utils._format_json(cost.get_custom_report(report_id)))
     elif account_name:
