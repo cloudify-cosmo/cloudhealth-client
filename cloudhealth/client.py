@@ -61,6 +61,27 @@ class HTTPClient(object):
                     url, response.status_code))
         return response.json()
 
+    def get_asset(self,
+                  uri,
+                  asset,
+                  data=None,
+                  params=None,
+                  headers=None,
+                  _include=None,
+                  expected_status_code=200,
+                  stream=False):
+        url =  '{0}{1}?api_key={2}&name={3}'.format(self.endpoint,  uri, self.api_key, asset)
+        response = requests.get(url,
+                                data=data,
+                                params=params,
+                                headers=headers,
+                                stream=stream)
+        if response.status_code != 200:
+            raise RuntimeError(
+                    'Request to {0} failed! (HTTP Error Code: {1})'.format(
+                            url, response.status_code))
+        return response.json()
+
 
 class CloudHealth(object):
     def __init__(self, api_key, endpoint=DEFAULT_CLOUDHEALTH_API_URL):
