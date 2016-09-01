@@ -93,21 +93,6 @@ class CostClient(object):
 
         return cost_by_account
 
-    def get_current_by_days(self, account_type='AWS-Account', account_name=None):
-        response = self.client.get(self.DAYS_COST_URL)
-
-        days_total_cost = []
-
-        list_of_days = self.list_days(self.DAYS_COST_URL)
-
-        cost_response = response['data'][0]
-        for days_cost in cost_response:
-            days_total_cost.append(days_cost[0])
-
-        cost_by_days = dict(zip(list_of_days, days_total_cost))
-
-        return cost_by_days
-
     def get_current_by_services(self, account_type='AWS-Account'):
         response = self.client.get(self.CURRENT_COST_URL)
 
@@ -122,6 +107,21 @@ class CostClient(object):
         cost_by_service = dict(zip(list_of_services, services_total_cost))
 
         return cost_by_service
+
+    def get_cost_by_days(self, account_type='AWS-Account', account_name=None):
+        response = self.client.get(self.DAYS_COST_URL)
+
+        days_total_cost = []
+
+        list_of_days = self.list_days(self.DAYS_COST_URL)
+
+        cost_response = response['data'][0]
+        for days_cost in cost_response:
+            days_total_cost.append(days_cost[0])
+
+        cost_by_days = dict(zip(list_of_days, days_total_cost))
+
+        return cost_by_days
 
     def get_cost_for_instances(self):
         response = self.client.get(self.INSTANCE_COST_URL)
