@@ -80,6 +80,11 @@ def list(ctx, account_type, resource_type):
               '--account-type',
               default='AWS-Account',
               help='The type to get the cost for [default: AWS-Account]')
+@click.option('-d',
+              '--by-days',
+              default=False,
+              is_flag=True,
+              help='Get current cost by days')
 @click.option('-S',
               '--by-service',
               default=False,
@@ -97,7 +102,7 @@ def list(ctx, account_type, resource_type):
               '--report_id',
               help='Get current cost of perspective group from a report This only works in 2 dimensions reports')
 @click.pass_context
-def current_cost(ctx, account_type, by_service, instance, account_name, report_id):
+def current_cost(ctx, account_type, by_days, by_service, instance, account_name, report_id):
     """Retrieve current cost for all accounts.
 
     Using the -S flag will get you a list of current services costs.
@@ -110,6 +115,8 @@ def current_cost(ctx, account_type, by_service, instance, account_name, report_i
     cost = ctx.obj['client']
     if instance:
         print(cost.get_cost_for_instances())[utils._get_yesterdays_date()]
+    elif by_days:
+        print(cost.get_current_by_days())[utils._get_yesterdays_date()]
     elif by_service:
         print(utils._format_json(cost.get_current_by_services()))
     elif report_id:
