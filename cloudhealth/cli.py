@@ -116,7 +116,7 @@ def current_cost(ctx, account_type, by_days, by_service, instance, account_name,
     if instance:
         print(cost.get_cost_for_instances())[utils._get_yesterdays_date()]
     elif by_days:
-        print(cost.get_current_by_days())[utils._get_yesterdays_date()]
+        print(cost.get_cost_by_days())[utils._get_yesterdays_date()]
     elif by_service:
         print(utils._format_json(cost.get_current_by_services()))
     elif report_id:
