@@ -64,13 +64,14 @@ class HTTPClient(object):
     def get_asset(self,
                   uri,
                   asset,
+                  include,
                   data=None,
                   params=None,
                   headers=None,
                   _include=None,
                   expected_status_code=200,
                   stream=False):
-        url =  '{0}{1}?api_key={2}&name={3}'.format(self.endpoint,  uri, self.api_key, asset)
+        url =  '{0}{1}?api_key={2}&name={3}&include={4}'.format(self.endpoint,  uri, self.api_key, asset, include)
         response = requests.get(url,
                                 data=data,
                                 params=params,

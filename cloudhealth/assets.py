@@ -14,11 +14,11 @@ class AssetsClient(object):
         assets = self.client.get(uri)
         return assets
 
-    def get(self, object_name):
+    def get(self, object_name, include):
 
         if object_name not in self.list():
             raise exceptions.CloudHealthError(
             'Object {0} does not exist'.format(object_name))
 
-        url = self.client.get_asset(uri=self.ASSESTS_BASE_URI, asset=object_name)
+        url = self.client.get_asset(uri=self.ASSESTS_BASE_URI, asset=object_name, include=include)
         return url

@@ -329,13 +329,14 @@ def list_assets(ctx):
 
 @assets.command(name='get')
 @click.argument('object-name')
+@click.argument('include')
 @click.pass_context
-def get_asset(ctx, object_name):
+def get_asset(ctx, object_name, include):
     """Retrieve a specific asset.
     """
     assets = ctx.obj['client']
     # print(utils._format_json(assets.get(object_name)))
-    print(utils._format_json(assets.get(object_name)))
+    print(utils._format_json(assets.get(object_name, include)))
 
 
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
