@@ -50,7 +50,6 @@ class HTTPClient(object):
             expected_status_code=200,
             stream=False):
         url = '{0}{1}api_key={2}'.format(self.endpoint, uri, self.api_key)
-        print url
         response = requests.get(url,
                                 data=data,
                                 params=params,

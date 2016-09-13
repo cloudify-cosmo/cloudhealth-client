@@ -138,7 +138,6 @@ def current_cost(ctx, account_type, by_days, by_service, instance, account_name,
               help='The account to get the cost for')
 @click.option('-m',
               '--month',
-              # default=utils._get_last_month,
               help='Sum of cost for the last month [default: Last Month]')
 @click.pass_context
 def account_history(ctx, account_type, account_name, month):
@@ -149,17 +148,28 @@ def account_history(ctx, account_type, account_name, month):
     Omitting both will get the total cost for previous month.
     """
     cost = ctx.obj['client']
-    if account_name and month:
+    if account_name and month == 'last':
+        full_history = cost.account_history(account_type)[utils._get_last_month()]
+        print full_history[account_name]
+    elif account_name and month:
         full_history = cost.account_history(account_type)[month]
         print full_history[account_name]
     elif account_name:
         full_history = cost.account_history(account_type)
         for each_month, account in full_history.iteritems():
             print each_month, account[account_name]
+    elif month == 'last':
+        full_history = cost.account_history(account_type)[utils._get_last_month()]
+        dict = {}
+        for name, amount in full_history.iteritems():
+            dict[name] = amount
+        print(utils._format_json(dict))
     elif month:
         full_history = cost.account_history(account_type)[month]
+        dict = {}
         for name, amount in full_history.iteritems():
-            print name, amount
+            dict[name] = amount
+        print(utils._format_json(dict))
     else:
         full_history = cost.account_history(account_type)
         print(utils._format_json(full_history))
@@ -180,8 +190,7 @@ def account_history(ctx, account_type, account_name, month):
               help='The service to get the cost for')
 @click.option('-m',
               '--month',
-              # default=utils._get_last_month,
-              help='Sum of cost for the last month [default: Last Month]')
+              help='Cost by month [type "last" for previous month]')
 @click.pass_context
 def service_history(ctx, account_type, service, month, instance):
     """Retrieve cost history by service.
@@ -191,19 +200,32 @@ def service_history(ctx, account_type, service, month, instance):
     Omitting both will get a dict of services cost for previous month.
     """
     cost = ctx.obj['client']
-    if month and service:
+    if instance:
+        print(utils._format_json(cost.get_cost_for_instances()))
+    elif month == "last" and service:
+        full_history = cost.service_history()[utils._get_last_month()]
+        print service, full_history[service]
+    elif month and service:
         full_history = cost.service_history()[month]
         print service, full_history[service]
     elif service:
         full_history = cost.service_history()
-        for each_month, service_cost in full_history.iteritems():
-            print each_month, service_cost[service]
+        dict = {}
+        for month, service_cost in full_history.iteritems():
+            dict[month] = service_cost[service]
+        print(utils._format_json(dict))
+    elif month == 'last':
+        full_history = cost.service_history()[utils._get_last_month()]
+        dict = {}
+        for service_name, service_cost in full_history.iteritems():
+            dict[service_name] = service_cost
+        print(utils._format_json(dict))
     elif month:
         full_history = cost.service_history()[month]
-        for each_month, service_cost in full_history.iteritems():
-            print each_month, service_cost
-    elif instance:
-        print(utils._format_json(cost.get_cost_for_instances()))
+        dict = {}
+        for service_name, service_cost in full_history.iteritems():
+            dict[service_name] = service_cost
+        print(utils._format_json(dict))
     else:
         full_history = cost.service_history()
         print(utils._format_json(full_history))

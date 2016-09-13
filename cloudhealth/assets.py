@@ -19,7 +19,7 @@ class AssetsClient(object):
             raise exceptions.CloudHealthError(
             'Object {0} does not exist'.format(object_name))
 
-        url = self.client.get(uri=self.ASSETS_BASE_URI.format(object_name, include))
+        response = self.client.get(uri=self.ASSETS_BASE_URI.format(object_name, include))
 
 
-        return url
+        return response
