@@ -2,7 +2,7 @@ import re
 from . import utils
 
 class UsageClient(object):
-    USAGE_URL = 'olap_reports/usage'
+    USAGE_URL = 'olap_reports/usage?'
 
     def __init__(self, client):
         self.client = client

@@ -116,7 +116,7 @@ def current_cost(ctx, account_type, by_days, by_service, instance, account_name,
     if instance:
         print(cost.get_cost_for_instances())[utils._get_yesterdays_date()]
     elif by_days:
-        print(cost.get_current_by_days())[utils._get_yesterdays_date()]
+        print(cost.get_cost_by_days())[utils._get_yesterdays_date()]
     elif by_service:
         print(utils._format_json(cost.get_current_by_services()))
     elif report_id:
@@ -329,13 +329,15 @@ def list_assets(ctx):
 
 @assets.command(name='get')
 @click.argument('object-name')
-@click.argument('include')
+@click.option('-i',
+              '--include',
+              default=None,
+              help='Asset related ')
 @click.pass_context
 def get_asset(ctx, object_name, include):
     """Retrieve a specific asset.
     """
     assets = ctx.obj['client']
-    # print(utils._format_json(assets.get(object_name)))
     print(utils._format_json(assets.get(object_name, include)))
 
 

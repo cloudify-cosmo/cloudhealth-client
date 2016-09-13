@@ -1,10 +1,10 @@
 class CostClient(object):
-    CURRENT_COST_URL = '/olap_reports/cost/current'
-    INSTANCE_COST_URL = '/olap_reports/cost/current/instance'
-    HISTORY_COST_URL = '/olap_reports/cost/history'
-    CUSTOM_REPORT_URL = '/olap_reports/custom/'
-    ACCOUNTS_HISTORY_COST_URL = '/olap_reports/custom/893353198679'
-    DAYS_COST_URL = '/olap_reports/custom/893353198899'
+    CURRENT_COST_URL = '/olap_reports/cost/current?'
+    INSTANCE_COST_URL = '/olap_reports/cost/current/instance?'
+    HISTORY_COST_URL = '/olap_reports/cost/history?'
+    CUSTOM_REPORT_URL = '/olap_reports/custom/?'
+    ACCOUNTS_HISTORY_COST_URL = '/olap_reports/custom/893353198679?'
+    DAYS_COST_URL = '/olap_reports/custom/893353198899?'
 
     def __init__(self, client):
         self.client = client
