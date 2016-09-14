@@ -2,9 +2,9 @@ class CostClient(object):
     CURRENT_COST_URL = '/olap_reports/cost/current?'
     INSTANCE_COST_URL = '/olap_reports/cost/current/instance?'
     HISTORY_COST_URL = '/olap_reports/cost/history?'
-    CUSTOM_REPORT_URL = '/olap_reports/custom/?'
-    ACCOUNTS_HISTORY_COST_URL = '/olap_reports/custom/893353198679?'
-    DAYS_COST_URL = '/olap_reports/custom/893353198899?'
+    CUSTOM_REPORT_URL = '/olap_reports/custom/{0}?'
+    ACCOUNTS_HISTORY_COST_URL = '/olap_reports/custom/{0}?'
+    DAYS_COST_URL = '/olap_reports/custom/{0}?'
 
     def __init__(self, client):
         self.client = client
@@ -13,10 +13,11 @@ class CostClient(object):
         response = self.client.get(url)
 
         list_of_days = []
+        # ADD handle to different responses
         if url == self.DAYS_COST_URL:
             days = response['dimensions'][1]["time"]
         else:
-            days = response['dimensions'][0]["time"]
+            days = response['dimensions'][1]["time"]
 
         for day in days:
             label = day['label']
@@ -24,8 +25,8 @@ class CostClient(object):
 
         return list_of_days
 
-    def list_months(self, type):
-        response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL)
+    def list_months(self, uri, report_id):
+        response = self.client.get(uri.format(report_id))
 
         list_of_months = []
         months = response['dimensions'][0]["time"]
@@ -58,7 +59,6 @@ class CostClient(object):
         for service in service_list:
             label = service['label']
             list_of_services.append(label.encode('ascii'))
-
 
         return list_of_services
 
@@ -108,12 +108,12 @@ class CostClient(object):
 
         return cost_by_service
 
-    def get_cost_by_days(self, account_type='AWS-Account', account_name=None):
-        response = self.client.get(self.DAYS_COST_URL)
+    def get_cost_by_days(self, report_id, account_type='AWS-Account', account_name=None):
+        response = self.client.get(self.DAYS_COST_URL.format(report_id))
 
         days_total_cost = []
 
-        list_of_days = self.list_days(self.DAYS_COST_URL)
+        list_of_days = self.list_days(self.DAYS_COST_URL.format(report_id))
 
         cost_response = response['data'][0]
         for days_cost in cost_response:
@@ -138,10 +138,10 @@ class CostClient(object):
 
         return cost_by_day
 
-    def account_history(self, account_type='AWS-Account'):
-        response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL)
+    def account_history(self, account_type, report_id):
+        response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL.format(report_id))
 
-        list_of_months = self.list_months(self.HISTORY_COST_URL)
+        list_of_months = self.list_months(self.ACCOUNTS_HISTORY_COST_URL.format(report_id), report_id)
         list_of_accounts = self.list_accounts(account_type)
 
         accounts_history = {}
@@ -155,10 +155,10 @@ class CostClient(object):
 
         return accounts_history
 
-    def service_history(self):
+    def service_history(self, report_id):
         response = self.client.get(self.HISTORY_COST_URL)
 
-        list_of_months = self.list_months(self.HISTORY_COST_URL)
+        list_of_months = self.list_months(self.HISTORY_COST_URL, report_id)
 
         service_cost_by_month = {}
         fetch_services = self.list_service()
