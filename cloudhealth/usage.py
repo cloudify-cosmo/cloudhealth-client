@@ -33,7 +33,6 @@ class UsageClient(object):
 
     def get(self, resource_type, date=utils._get_yesterdays_date()):
         uri = self.USAGE_URL + '/' + resource_type + '?'
-        print uri
         response = self.client.get(uri)
 
         total_usage = []
