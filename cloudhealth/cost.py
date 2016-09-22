@@ -64,7 +64,7 @@ class CostClient(object):
 
     def list_groups(self, report_id):
 
-        response = self.client.get(self.CUSTOM_REPORT_URL + report_id)
+        response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
         list_of_groups = []
         for group_name in response['dimensions'][0]:
@@ -173,7 +173,7 @@ class CostClient(object):
         return service_cost_by_month
 
     def get_custom_report(self, report_id):
-        response = self.client.get(self.CUSTOM_REPORT_URL + report_id)
+        response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
         groups_cost = []
         groups_names = self.list_groups(report_id)
