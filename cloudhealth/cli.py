@@ -109,6 +109,9 @@ def current_cost(ctx, report_id, account_type, by_days, resource, account_name, 
     Omitting both will get the total cost of all accounts.
 
     Specifying a report id will get you the current cost based on filter and grouping done in web console
+
+    You can set the `CLOUDHEALTH_DAYS_COST_REPORT` environment variable instead
+    of using the `--report-id` everytime.
     """
     cost = ctx.obj['client']
     if resource:
@@ -128,13 +131,12 @@ def current_cost(ctx, report_id, account_type, by_days, resource, account_name, 
         print(utils._format_json(cost.get_current_by_accounts(account_type, account_name)))
 
 
-
 @cost.command('account-history')
 @click.option('-t',
               '--account-type',
               default='AWS-Account',
               help='The type to get the cost for [default: AWS-Account]')
-@click.option('-i',
+@click.option('-id',
               '--report-id',
               required=True,
               envvar='CLOUDHEALTH_ACCOUNTS_HISTORY_REPORT',
@@ -152,6 +154,11 @@ def account_history(ctx, account_type, report_id, account_name, month):
     Specifying an account name will get the cost for the previous month.
     Specifying an account type will get the cost to all accounts of that type.
     Omitting both will get the total cost for previous month.
+
+    Specifying a report id will get you the current cost based on filter and grouping done in web console
+
+    You can set the `CLOUDHEALTH_ACCOUNTS_HISTORY_REPORT` environment variable instead
+    of using the `--report-id` everytime.
     """
     cost = ctx.obj['client']
     if account_name and month:
@@ -239,13 +246,13 @@ def service_history(ctx, account_type, report_id, service, month):
         print(utils._format_json(full_history))
 
 
-
 @_cloudhealth.group(context_settings=CLICK_CONTEXT_SETTINGS, cls=DYMGroup)
 @click.pass_context
 def usage(ctx):
     """Retrieve resource usage related information
     """
     ctx.obj['client'] = ctx.obj['client'].usage
+
 
 @usage.command('list')
 @click.option('-t',
@@ -259,6 +266,7 @@ def list_services(ctx, account_type):
     usage = ctx.obj['client']
     print "list"
     print(utils._format_json(usage.list_services(account_type)))
+
 
 @usage.command('get')
 @click.argument('resource-type')
@@ -300,9 +308,6 @@ def list_reports(ctx):
     """
     reports = ctx.obj['client']
     print(utils._format_json(reports.list()))
-    # reports_list = reports.list(topic)
-    # for report in reports_list:
-    #     print(report)
 
 
 @reports.command('list-topics')

@@ -3,8 +3,6 @@ class CostClient(object):
     INSTANCE_COST_URL = 'olap_reports/cost/current/instance?'
     HISTORY_COST_URL = 'olap_reports/cost/history?'
     CUSTOM_REPORT_URL = 'olap_reports/custom/{0}?'
-    ACCOUNTS_HISTORY_COST_URL = 'olap_reports/custom/{0}?'
-    DAYS_COST_URL = 'olap_reports/custom/{0}?'
 
     def __init__(self, client):
         self.client = client
@@ -21,7 +19,7 @@ class CostClient(object):
         # ADD handle to different responses
         # something is broken here since I made the change to move the report ID
         # I need to check all the function to confirm it all works
-        if url == self.DAYS_COST_URL:
+        if url == self.CUSTOM_REPORT_URL:
             days = response['dimensions'][1]["time"]
         else:
             days = response['dimensions'][1]["time"]
@@ -57,7 +55,6 @@ class CostClient(object):
         return list_of_accounts
 
     def list_service(self, account_type='AWS-Service-Category'):
-
         response = self.client.get(self.HISTORY_COST_URL)
 
         list_of_services = []
@@ -70,7 +67,6 @@ class CostClient(object):
         return list_of_services
 
     def list_groups(self, report_id):
-
         response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
         list_of_groups = []
@@ -82,14 +78,12 @@ class CostClient(object):
             label = service['label']
             list_of_groups.append(label.encode('ascii'))
 
-
         return list_of_groups
 
     def get_current_by_accounts(self, account_type='AWS-Account', account_name=None):
         response = self.client.get(self.CURRENT_COST_URL)
 
         accounts_total_cost = []
-
         list_of_aws_accounts = self.list_accounts(account_type)
 
         cost_response = response['data']
@@ -107,7 +101,6 @@ class CostClient(object):
         response = self.client.get(self.CURRENT_COST_URL)
 
         services_total_cost = []
-
         list_of_services = self.list_service(account_type)
 
         cost_response = response['data']
@@ -119,11 +112,10 @@ class CostClient(object):
         return cost_by_service
 
     def get_cost_by_days(self, report_id, account_type='AWS-Account', account_name=None):
-        response = self.client.get(self.DAYS_COST_URL.format(report_id))
+        response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
         days_total_cost = []
-
-        list_of_days = self.list_days(self.DAYS_COST_URL.format(report_id))
+        list_of_days = self.list_days(self.CUSTOM_REPORT_URL.format(report_id))
 
         cost_response = response['data'][0]
         for days_cost in cost_response:
@@ -137,7 +129,6 @@ class CostClient(object):
         response = self.client.get(self.INSTANCE_COST_URL)
 
         instace_total_cost = []
-
         list_of_days = self.list_days(self.INSTANCE_COST_URL)
 
         cost_response = response['data']
@@ -149,9 +140,9 @@ class CostClient(object):
         return cost_by_day
 
     def account_history(self, account_type, report_id):
-        response = self.client.get(self.ACCOUNTS_HISTORY_COST_URL.format(report_id))
+        response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
-        list_of_months = self.list_months(self.ACCOUNTS_HISTORY_COST_URL.format(report_id), report_id)
+        list_of_months = self.list_months(self.CUSTOM_REPORT_URL.format(report_id), report_id)
         list_of_accounts = self.list_accounts(account_type)
 
         accounts_history = {}
@@ -169,7 +160,6 @@ class CostClient(object):
         response = self.client.get(self.HISTORY_COST_URL)
 
         list_of_months = self.list_months(self.HISTORY_COST_URL, report_id)
-
         service_cost_by_month = {}
         fetch_services = self.list_service()
 
