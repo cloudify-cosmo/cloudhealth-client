@@ -96,7 +96,7 @@ def list(ctx, account_type, resource_type):
 @click.option('-n',
               '--account-name',
               help='The account to get the cost for')
-@click.option('-cid',
+@click.option('-cr',
               '--custom_report_id',
               help='Get current cost of perspective group from a report\
                This only works in 2 dimensions reports')
@@ -104,7 +104,6 @@ def list(ctx, account_type, resource_type):
 def current_cost(ctx, report_id, account_type, by_days, resource, account_name, custom_report_id):
     """Retrieve current cost for all accounts.
 
-    Using the -S flag will get you a list of current services costs.
     Specifying an account name will get the current cost for that account only.
     Specifying an account type will get the cost to all accounts of that type.
     Omitting both will get the total cost of all accounts.
@@ -121,10 +120,10 @@ def current_cost(ctx, report_id, account_type, by_days, resource, account_name, 
             pass
     elif by_days:
         print(cost.get_cost_by_days(report_id))[utils._get_yesterdays_date()]
-    elif report_id:
-        print(utils._format_json(cost.get_custom_report(custom_report_id)))
     elif account_name:
         print(cost.get_current_by_accounts(account_type, account_name)[account_name])
+    elif custom_report_id:
+        print(utils._format_json(cost.get_custom_report(custom_report_id)))
     else:
         print(utils._format_json(cost.get_current_by_accounts(account_type, account_name)))
 
@@ -211,32 +210,32 @@ def service_history(ctx, account_type, report_id, service, month):
     cost = ctx.obj['client']
     if month and service:
         if month == "last" and service:
-            full_history = cost.service_history(report_id)[utils._get_last_month()]
+            full_history = cost.service_history(account_type, report_id)[utils._get_last_month()]
             print service, full_history[service]
         else:
-            full_history = cost.service_history(report_id)[month]
+            full_history = cost.service_history(account_type, report_id)[month]
             print service, full_history[service]
     elif month:
         if month == 'last':
-            full_history = cost.service_history(report_id)[utils._get_last_month()]
+            full_history = cost.service_history(account_type, report_id)[utils._get_last_month()]
             dict = {}
             for service_name, service_cost in full_history.iteritems():
                 dict[service_name] = service_cost
             print(utils._format_json(dict))
         else:
-            full_history = cost.service_history(report_id)[month]
+            full_history = cost.service_history(account_type, report_id)[month]
             dict = {}
             for service_name, service_cost in full_history.iteritems():
                 dict[service_name] = service_cost
             print(utils._format_json(dict))
     elif service:
-        full_history = cost.service_history(report_id)
+        full_history = cost.service_history(account_type, report_id)
         dict = {}
         for month, service_cost in full_history.iteritems():
             dict[month] = service_cost[service]
         print(utils._format_json(dict))
     else:
-        full_history = cost.service_history(report_id)
+        full_history = cost.service_history(account_type, report_id)
         print(utils._format_json(full_history))
 
 
@@ -258,6 +257,7 @@ def list_services(ctx, account_type):
     """Retrieve list of usage resources
     """
     usage = ctx.obj['client']
+    print "list"
     print(utils._format_json(usage.list_services(account_type)))
 
 @usage.command('get')
@@ -276,7 +276,7 @@ def get_usage(ctx, resource_type, date):
     """
     usage = ctx.obj['client']
     if date == 'all':
-        print(usage.get(resource_type=resource_type, date=date))
+        print(utils._format_json(usage.get(resource_type=resource_type, date=date)))
     elif date:
         print(usage.get(resource_type=resource_type, date=date)[date])
     else:
