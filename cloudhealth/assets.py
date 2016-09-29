@@ -1,8 +1,7 @@
 from . import exceptions
 
 class AssetsClient(object):
-    ASSESTS_BASE_URI = '/api/search.json'
-
+    ASSETS_BASE_URI = 'api/search.json?name={0}&include={1}&'
 
     def __init__(self, client):
         self.client = client
@@ -10,15 +9,17 @@ class AssetsClient(object):
     def list(self):
         assets = []
 
-        uri = '/api.json'
+        uri = '/api.json?'
         assets = self.client.get(uri)
         return assets
 
-    def get(self, object_name):
+    def get(self, object_name, include):
 
         if object_name not in self.list():
             raise exceptions.CloudHealthError(
             'Object {0} does not exist'.format(object_name))
 
-        url = self.client.get_asset(uri=self.ASSESTS_BASE_URI, asset=object_name)
-        return url
+        response = self.client.get(uri=self.ASSETS_BASE_URI.format(object_name, include))
+
+
+        return response
