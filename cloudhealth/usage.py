@@ -1,5 +1,6 @@
 import re
 
+
 class UsageClient(object):
     USAGE_URL = 'olap_reports/usage?'
 
@@ -29,7 +30,10 @@ class UsageClient(object):
         return list_pf_services
 
     def get(self, resource_type, date):
-        uri = '{0}{1}{2}{3}'.format(self.USAGE_URL[:-1], '/', resource_type, '?')
+        uri = '{0}{1}{2}{3}'.format(self.USAGE_URL[:-1],
+                                    '/',
+                                    resource_type,
+                                    '?')
         response = self.client.get(uri)
 
         total_usage = []

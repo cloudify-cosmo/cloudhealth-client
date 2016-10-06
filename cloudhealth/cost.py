@@ -7,22 +7,15 @@ class CostClient(object):
     def __init__(self, client):
         self.client = client
 
-    def __work_on_data(self, data, list_name, depth):
-        orig_data =  data[list_name]
-        for item in orig_data:
-            print item[depth]
-
-    def list_days(self, url):
+    def list_days(self, url, report_id):
         response = self.client.get(url)
 
         list_of_days = []
-        # ADD handle to different responses
-        # something is broken here since I made the change to move the report ID
-        # I need to check all the function to confirm it all works
-        if url == self.CUSTOM_REPORT_URL:
+
+        if report_id == '893353198899':
             days = response['dimensions'][1]["time"]
         else:
-            days = response['dimensions'][1]["time"]
+            days = response['dimensions'][0]["time"]
 
         for day in days:
             label = day['label']
@@ -54,11 +47,11 @@ class CostClient(object):
 
         return list_of_accounts
 
-    def list_service(self, account_type='AWS-Service-Category'):
+    def list_service(self, service_type='AWS-Service-Category'):
         response = self.client.get(self.HISTORY_COST_URL)
 
         list_of_services = []
-        service_list = response['dimensions'][1][account_type]
+        service_list = response['dimensions'][1][service_type]
 
         for service in service_list:
             label = service['label']
@@ -80,16 +73,16 @@ class CostClient(object):
 
         return list_of_groups
 
-    def get_current_by_accounts(self, account_type='AWS-Account', account_name=None):
+    def get_current_by_accounts(self,
+                                account_type='AWS-Account',
+                                account_name=None):
         response = self.client.get(self.CURRENT_COST_URL)
 
         accounts_total_cost = []
         list_of_aws_accounts = self.list_accounts(account_type)
 
         cost_response = response['data']
-        # This part is replicated several times starting from here, Should I create a function to handle it?
-        # I started something but it's not an easy task (at least at first glance)
-        # cost_response = self.__work_on_data(response, 'data', 0)
+
         for accounts_total in cost_response:
             accounts_total_cost.append(accounts_total[0][0])
 
@@ -101,7 +94,7 @@ class CostClient(object):
         response = self.client.get(self.CURRENT_COST_URL)
 
         services_total_cost = []
-        list_of_services = self.list_service(account_type)
+        list_of_services = self.list_service()
 
         cost_response = response['data']
         for services_total in cost_response[0]:
@@ -111,11 +104,14 @@ class CostClient(object):
 
         return cost_by_service
 
-    def get_cost_by_days(self, report_id, account_type='AWS-Account', account_name=None):
+    def get_cost_by_days(self, report_id,
+                         account_type='AWS-Account',
+                         account_name=None):
         response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
         days_total_cost = []
-        list_of_days = self.list_days(self.CUSTOM_REPORT_URL.format(report_id))
+        list_of_days = self.list_days(self.CUSTOM_REPORT_URL.format(report_id),
+                                      report_id)
 
         cost_response = response['data'][0]
         for days_cost in cost_response:
@@ -142,14 +138,16 @@ class CostClient(object):
     def account_history(self, account_type, report_id):
         response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
-        list_of_months = self.list_months(self.CUSTOM_REPORT_URL.format(report_id), report_id)
+        list_of_months = self.list_months(
+                self.CUSTOM_REPORT_URL.format(report_id), report_id)
         list_of_accounts = self.list_accounts(account_type)
 
         accounts_history = {}
 
         cost_response = response['data']
         for month_cost, each_month in zip(cost_response, list_of_months):
-            accounts_cost_history_by_month = dict(zip(list_of_accounts, sum(month_cost, [])))
+            accounts_cost_history_by_month = dict(zip(list_of_accounts,
+                                                      sum(month_cost, [])))
             months_total = {each_month: accounts_cost_history_by_month}
             for key, value in months_total.iteritems():
                 accounts_history[key] = value
@@ -165,7 +163,9 @@ class CostClient(object):
 
         cost_response = response['data']
         for month_cost, each_month in zip(cost_response, list_of_months):
-            service_cost_history_by_month = dict(zip(fetch_services, sum(month_cost, [])))
+            service_cost_history_by_month = dict(zip(fetch_services,
+                                                     sum(month_cost,
+                                                         [])))
             months_total = {each_month: service_cost_history_by_month}
             for key, value in months_total.iteritems():
                 service_cost_by_month[key] = value

@@ -4,6 +4,8 @@ from cloudhealth import exceptions
 
 
 class ReportsClient(object):
+    BASE_REPORT_URL = '/olap_reports/custom/?'
+
     def __init__(self, client):
         self.client = client
 
@@ -12,7 +14,7 @@ class ReportsClient(object):
         reports_name = []
         links_list = []
 
-        uri = '/olap_reports/custom/?'
+        uri = self.BASE_REPORT_URL
         if topic:
             uri = uri + '/{0}'.format(topic)
         response = self.client.get(uri)
@@ -22,11 +24,26 @@ class ReportsClient(object):
             reports.append(link_item['href'])
 
         for i in reports:
-            links_list.append(re.findall('report_id=(.*?)$', i.encode('ascii'), re.DOTALL))
-        links_list = sum(links_list,[])
+            links_list.append(re.findall(
+                    'report_id=(.*?)$', i.encode('ascii'), re.DOTALL))
+        links_list = sum(links_list, [])
         reports_and_ids = dict(zip(links_list, reports_name))
 
         return reports_and_ids
+
+    def list_groups(self, uri):
+        response = self.client.get(uri)
+
+        list_of_groups = []
+        for group_name in response['dimensions'][0]:
+            pass
+        group_list = response['dimensions'][0][group_name]
+
+        for service in group_list:
+            label = service['label']
+            list_of_groups.append(label.encode('ascii'))
+
+        return list_of_groups
 
     def topics(self):
         topics = []
@@ -48,4 +65,14 @@ class ReportsClient(object):
                 'Must either provide a report id or a topic and report-name')
 
         report = self.client.get(uri)
-        return report
+
+        groups_cost = []
+        groups_names = self.list_groups(uri)
+
+        cost_response = report['data']
+        for group_total in cost_response:
+            groups_cost.append(group_total[0])
+
+        cost_by_group = dict(zip(groups_names, groups_cost))
+
+        return cost_by_group
