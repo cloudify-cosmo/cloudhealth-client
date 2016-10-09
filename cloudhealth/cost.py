@@ -7,12 +7,12 @@ class CostClient(object):
     def __init__(self, client):
         self.client = client
 
-    def list_days(self, url, report_id):
+    def list_days(self, url):
         response = self.client.get(url)
 
         list_of_days = []
 
-        if report_id == '893353198899':
+        if response['dimensions'][1]["time"]:
             days = response['dimensions'][1]["time"]
         else:
             days = response['dimensions'][0]["time"]
@@ -110,8 +110,7 @@ class CostClient(object):
         response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
         days_total_cost = []
-        list_of_days = self.list_days(self.CUSTOM_REPORT_URL.format(report_id),
-                                      report_id)
+        list_of_days = self.list_days(self.CUSTOM_REPORT_URL.format(report_id))
 
         cost_response = response['data'][0]
         for days_cost in cost_response:
