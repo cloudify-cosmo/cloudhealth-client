@@ -25,6 +25,7 @@ class CostClient(object):
 
     def list_months(self, uri, report_id):
         response = self.client.get(uri.format(report_id))
+        print response
 
         list_of_months = []
         months = response['dimensions'][0]["time"]
