@@ -38,10 +38,10 @@ def test_cost_current(FULL_JSON):
 @patch('cloudhealth.cost.CostClient.list_months', return_value=MONTH_LIST())
 def test_cost_account_history(FULL_JSON, MONTH_LIST):
 
-    assert ch.cost.account_history('AWS-Account', 'b')
+    assert ch.cost.account_history('AWS-Account', 'b')['dimensions']['test-account'] == 200
 
 @patch('cloudhealth.client.HTTPClient.get', return_value=FULL_JSON())
 @patch('cloudhealth.cost.CostClient.list_months', return_value=MONTH_LIST())
 def test_cost_service_history(FULL_JSON, MONTH_LIST):
 
-    assert ch.cost.service_history('AWS-Account', 'b')
+    assert ch.cost.service_history('AWS-Account', 'b')['dimensions']['EC2 - Compute'] == 200
