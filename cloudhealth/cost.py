@@ -12,10 +12,11 @@ class CostClient(object):
 
         list_of_days = []
 
-        if response['dimensions'][1]["time"]:
+        try:
             days = response['dimensions'][1]["time"]
-        else:
+        except KeyError:
             days = response['dimensions'][0]["time"]
+
 
         for day in days:
             label = day['label']
