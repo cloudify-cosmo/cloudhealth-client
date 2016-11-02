@@ -10,7 +10,6 @@ class TestingUtils():
         assert type(utils._get_last_month()) is str
 
 
-
 class Testing_Cost_Client():
     ch = client.CloudHealth('')
 

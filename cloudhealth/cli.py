@@ -163,18 +163,18 @@ def account_history(ctx,
     cost = ctx.obj['client']
     if account_name and month:
         if month == 'last':
-            full_history = cost.account_history(
+            full_history = cost.get_account_history(
                     account_type,
                     report_id)[utils._get_last_month()]
             print full_history[account_name]
         else:
-            full_history = cost.account_history(
+            full_history = cost.get_account_history(
                     account_type,
                     report_id)[month]
             print full_history[account_name]
     elif month:
         if month == 'last':
-            full_history = cost.account_history(
+            full_history = cost.get_account_history(
                     account_type,
                     report_id)[utils._get_last_month()]
             dict = {}
@@ -182,7 +182,7 @@ def account_history(ctx,
                 dict[name] = amount
             print(utils._format_json(dict))
         else:
-            full_history = cost.account_history(
+            full_history = cost.get_account_history(
                     account_type,
                     report_id)[month]
             dict = {}
@@ -190,7 +190,7 @@ def account_history(ctx,
                 dict[name] = amount
             print(utils._format_json(dict))
     elif account_name:
-        full_history = cost.account_history(
+        full_history = cost.get_account_history(
                 account_type,
                 report_id)
         for each_month, account in full_history.iteritems():
@@ -198,7 +198,7 @@ def account_history(ctx,
     elif by_days:
         print(utils._format_json(cost.get_cost_by_days(report_id)))
     else:
-        full_history = cost.account_history(
+        full_history = cost.get_account_history(
                 account_type,
                 report_id)
         print(utils._format_json(full_history))
@@ -237,18 +237,18 @@ def service_history(ctx,
     cost = ctx.obj['client']
     if month and service:
         if month == "last" and service:
-            full_history = cost.service_history(
+            full_history = cost.get_service_history(
                     account_type,
                     report_id)[utils._get_last_month()]
             print service, full_history[service]
         else:
-            full_history = cost.service_history(
+            full_history = cost.get_service_history(
                     account_type,
                     report_id)[month]
             print service, full_history[service]
     elif month:
         if month == 'last':
-            full_history = cost.service_history(
+            full_history = cost.get_service_history(
                     account_type,
                     report_id)[utils._get_last_month()]
             dict = {}
@@ -256,7 +256,7 @@ def service_history(ctx,
                 dict[service_name] = service_cost
             print(utils._format_json(dict))
         else:
-            full_history = cost.service_history(
+            full_history = cost.get_service_history(
                     account_type,
                     report_id)[month]
             dict = {}
@@ -264,7 +264,7 @@ def service_history(ctx,
                 dict[service_name] = service_cost
             print(utils._format_json(dict))
     elif service:
-        full_history = cost.service_history(
+        full_history = cost.get_service_history(
                 account_type,
                 report_id)
         dict = {}
@@ -272,7 +272,7 @@ def service_history(ctx,
             dict[month] = service_cost[service]
         print(utils._format_json(dict))
     else:
-        full_history = cost.service_history(
+        full_history = cost.get_service_history(
                 account_type,
                 report_id)
         print(utils._format_json(full_history))

@@ -26,25 +26,25 @@ def _get_yesterdays_date():
     if current.day == 1:
         if current_time.hour <= 6:
             return _format_date(date(current.year,
-                        current.month-1,
-                        (calendar.monthrange(
-                                current.year,
-                                current.month-1)[2])), "day")
+                                     current.month-1,
+                                     (calendar.monthrange(
+                                             current.year,
+                                             current.month-1)[2])), "day")
         else:
             return _format_date(date(current.year,
-                        current.month-1,
-                        (calendar.monthrange(
-                                current.year,
-                                current.month-1)[1])), "day")
+                                     current.month-1,
+                                     (calendar.monthrange(
+                                             current.year,
+                                             current.month-1)[1])), "day")
     else:
         if current_time.hour <= 6:
             return _format_date(date(current.year,
-                        current.month,
-                        current.day-2), "day")
+                                     current.month,
+                                     current.day-2), "day")
         else:
             return _format_date(date(current.year,
-                        current.month,
-                        current.day-1), "day")
+                                     current.month,
+                                     current.day-1), "day")
 
 
 def _get_last_month():
