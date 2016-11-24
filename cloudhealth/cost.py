@@ -3,86 +3,48 @@ class CostClient(object):
     INSTANCE_COST_URL = 'olap_reports/cost/current/instance?'
     HISTORY_COST_URL = 'olap_reports/cost/history?'
     CUSTOM_REPORT_URL = 'olap_reports/custom/{0}?'
+    DATE_NAME = 'time'
 
     def __init__(self, client):
         self.client = client
 
-    def list_days(self, url):
+    def _list_object(self, url, requested_object):
+        """List function to support the get functions.
+
+         This function helps build the lists to be used by other functions.
+         It should be use internally only.
+
+        """
         response = self.client.get(url)
 
-        list_of_days = []
+        list_of_objects = []
 
-        if response['dimensions'][1]["time"]:
-            days = response['dimensions'][1]["time"]
-        else:
-            days = response['dimensions'][0]["time"]
+        try:
+            list_object = response['dimensions'][0][requested_object]
+        except KeyError:
+            list_object = response['dimensions'][1][requested_object]
 
-        for day in days:
-            label = day['label']
-            list_of_days.append(label)
+        for instance in list_object:
+            object = instance['label']
+            list_of_objects.append(object)
 
-        return list_of_days
-
-    def list_months(self, uri, report_id):
-        response = self.client.get(uri.format(report_id))
-
-        list_of_months = []
-        months = response['dimensions'][0]["time"]
-
-        for month in months:
-            label = month['label']
-            list_of_months.append(label.encode('ascii'))
-
-        return list_of_months
-
-    def list_accounts(self, account_type):
-        response = self.client.get(self.CURRENT_COST_URL)
-
-        list_of_accounts = []
-        accounts_list = response['dimensions'][0][account_type]
-
-        for account in accounts_list:
-            label = account['label']
-            list_of_accounts.append(label.encode('ascii'))
-
-        return list_of_accounts
-
-    def list_service(self, service_type='AWS-Service-Category'):
-        response = self.client.get(self.HISTORY_COST_URL)
-
-        list_of_services = []
-        service_list = response['dimensions'][1][service_type]
-
-        for service in service_list:
-            label = service['label']
-            list_of_services.append(label.encode('ascii'))
-
-        return list_of_services
-
-    def list_groups(self, report_id):
-        response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
-
-        list_of_groups = []
-        for group_name in response['dimensions'][0]:
-            pass
-        group_list = response['dimensions'][0][group_name]
-
-        for service in group_list:
-            label = service['label']
-            list_of_groups.append(label.encode('ascii'))
-
-        return list_of_groups
+        return list_of_objects
 
     def get_current_by_accounts(self,
                                 account_type='AWS-Account',
                                 account_name=None):
+        """Fetch data on current cost from start of month by accounts
+
+        Returns dictionary of account:cost
+
+        """
         response = self.client.get(self.CURRENT_COST_URL)
 
         accounts_total_cost = []
-        list_of_aws_accounts = self.list_accounts(account_type)
+        list_of_aws_accounts = self._list_object(self.CURRENT_COST_URL,
+                                                 account_type)
 
         cost_response = response['data']
-
         for accounts_total in cost_response:
             accounts_total_cost.append(accounts_total[0][0])
 
@@ -90,14 +52,21 @@ class CostClient(object):
 
         return cost_by_account
 
-    def get_current_by_services(self, account_type='AWS-Account'):
+    def get_current_by_services(self, account_type='AWS-Account',
+                                service_type='AWS-Service-Category'):
+        """Fetch data on current cost from start of month by service type
+
+        Returns dictionary of service:cost
+
+        """
         response = self.client.get(self.CURRENT_COST_URL)
 
         services_total_cost = []
-        list_of_services = self.list_service()
+        list_of_services = self._list_object(self.CURRENT_COST_URL,
+                                             service_type)
 
-        cost_response = response['data']
-        for services_total in cost_response[0]:
+        cost_response = response['data'][0]
+        for services_total in cost_response:
             services_total_cost.append(services_total[0])
 
         cost_by_service = dict(zip(list_of_services, services_total_cost))
@@ -107,10 +76,16 @@ class CostClient(object):
     def get_cost_by_days(self, report_id,
                          account_type='AWS-Account',
                          account_name=None):
+        """Fetch data of cost per day for all accounts and services
+
+        Returns dictionary of day_date:cost
+
+        """
         response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
         days_total_cost = []
-        list_of_days = self.list_days(self.CUSTOM_REPORT_URL.format(report_id))
+        list_of_days = self._list_object(
+                self.CUSTOM_REPORT_URL.format(report_id), self.DATE_NAME)
 
         cost_response = response['data'][0]
         for days_cost in cost_response:
@@ -121,10 +96,16 @@ class CostClient(object):
         return cost_by_days
 
     def get_cost_for_instances(self):
+        """Fetch data of cost per day for instances on all accounts
+
+        Returns dictionary of day_date:cost_for_instances
+
+        """
         response = self.client.get(self.INSTANCE_COST_URL)
 
         instace_total_cost = []
-        list_of_days = self.list_days(self.INSTANCE_COST_URL)
+        list_of_days = self._list_object(self.INSTANCE_COST_URL,
+                                         self.DATE_NAME)
 
         cost_response = response['data']
         for instance_cost in cost_response:
@@ -134,12 +115,20 @@ class CostClient(object):
 
         return cost_by_day
 
-    def account_history(self, account_type, report_id):
+    def get_account_history(self, account_type, report_id):
+        """Fetch the cost history for account
+
+        For best results save a report that uses "Accounts" as Category
+         the interval should be by month
+        Returns a dictionary of months with a dictionary of accounts:cost
+
+        """
         response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
-        list_of_months = self.list_months(
-                self.CUSTOM_REPORT_URL.format(report_id), report_id)
-        list_of_accounts = self.list_accounts(account_type)
+        list_of_months = self._list_object(
+                self.CUSTOM_REPORT_URL.format(report_id), self.DATE_NAME)
+        list_of_accounts = self._list_object(self.CURRENT_COST_URL,
+                                             account_type)
 
         accounts_history = {}
 
@@ -153,12 +142,29 @@ class CostClient(object):
 
         return accounts_history
 
-    def service_history(self, account_type, report_id):
-        response = self.client.get(self.HISTORY_COST_URL)
+    def get_service_history(self, account_type, report_id,
+                        service_type='AWS-Service-Category'):
+        """Fetch the cost history for service type
 
-        list_of_months = self.list_months(self.HISTORY_COST_URL, report_id)
+        Returns a dictionary of months with a dictionary of service:cost
+        Using report_id will limit the results to only desired services
+         and history of
+
+        """
+        if report_id:
+            response = self.client.get(
+                    self.CUSTOM_REPORT_URL.format(report_id))
+            fetch_services = self._list_object(
+                    self.CUSTOM_REPORT_URL.format(report_id), service_type)
+        else:
+            response = self.client.get(self.HISTORY_COST_URL)
+            fetch_services = self._list_object(self.CURRENT_COST_URL,
+                                               service_type)
+
+        list_of_months = self._list_object(self.HISTORY_COST_URL,
+                                           self.DATE_NAME)
+
         service_cost_by_month = {}
-        fetch_services = self.list_service()
 
         cost_response = response['data']
         for month_cost, each_month in zip(cost_response, list_of_months):
@@ -172,10 +178,20 @@ class CostClient(object):
         return service_cost_by_month
 
     def get_custom_report(self, report_id):
+        """Fetch data on current cost from start of month by custom grouping
+
+       Returns dictionary of service\account\group:cost
+       This will work with 2 dimensions reports only!
+
+       """
         response = self.client.get(self.CUSTOM_REPORT_URL.format(report_id))
 
+        for key in response['dimensions'][0].iterkeys():
+            group_name = key
+
         groups_cost = []
-        groups_names = self.list_groups(report_id)
+        groups_names = self._list_object(
+                self.CUSTOM_REPORT_URL.format(report_id), group_name)
 
         cost_response = response['data']
         for group_total in cost_response:
