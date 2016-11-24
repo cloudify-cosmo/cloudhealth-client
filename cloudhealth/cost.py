@@ -43,13 +43,10 @@ class CostClient(object):
         accounts_total_cost = []
         list_of_aws_accounts = self._list_object(self.CURRENT_COST_URL,
                                                  account_type)
-        print list_of_aws_accounts
 
         cost_response = response['data']
         for accounts_total in cost_response:
             accounts_total_cost.append(accounts_total[0][0])
-
-        print accounts_total_cost
 
         cost_by_account = dict(zip(list_of_aws_accounts, accounts_total_cost))
 
