@@ -16,11 +16,11 @@
 import requests
 from requests.packages import urllib3
 
+from cloudhealth.accounts import AccountsClient
 from .cost import CostClient
 from .usage import UsageClient
 from .assets import AssetsClient
 from .reports import ReportsClient
-
 
 DEFAULT_CLOUDHEALTH_API_URL = 'https://chapi.cloudhealthtech.com/'
 
@@ -70,7 +70,7 @@ class HTTPClient(object):
                   _include=None,
                   expected_status_code=200,
                   stream=False):
-        url =  '{0}{1}?api_key={2}&name={3}'.format(self.endpoint,  uri, self.api_key, asset)
+        url = '{0}{1}?api_key={2}&name={3}'.format(self.endpoint, uri, self.api_key, asset)
         response = requests.get(url,
                                 data=data,
                                 params=params,
@@ -78,16 +78,18 @@ class HTTPClient(object):
                                 stream=stream)
         if response.status_code != 200:
             raise RuntimeError(
-                    'Request to {0} failed! (HTTP Error Code: {1})'.format(
-                            url, response.status_code))
+                'Request to {0} failed! (HTTP Error Code: {1})'.format(
+                    url, response.status_code))
         return response.json()
 
 
 class CloudHealth(object):
     def __init__(self, api_key, endpoint=DEFAULT_CLOUDHEALTH_API_URL):
         self._client = HTTPClient(endpoint, api_key)
+        self._client_v1 = HTTPClient(endpoint + 'v1/', api_key)
 
         self.reports = ReportsClient(self._client)
         self.assets = AssetsClient(self._client)
         self.cost = CostClient(self._client)
         self.usage = UsageClient(self._client)
+        self.accounts = AccountsClient(self._client_v1)
