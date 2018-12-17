@@ -16,7 +16,7 @@
 import requests
 from requests.packages import urllib3
 
-from cloudhealth.accounts import AccountsClient
+from .accounts import AccountsClient
 from .cost import CostClient
 from .usage import UsageClient
 from .assets import AssetsClient
