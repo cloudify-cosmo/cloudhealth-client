@@ -86,10 +86,9 @@ class HTTPClient(object):
 class CloudHealth(object):
     def __init__(self, api_key, endpoint=DEFAULT_CLOUDHEALTH_API_URL):
         self._client = HTTPClient(endpoint, api_key)
-        self._client_v1 = HTTPClient(endpoint + 'v1/', api_key)
 
         self.reports = ReportsClient(self._client)
         self.assets = AssetsClient(self._client)
         self.cost = CostClient(self._client)
         self.usage = UsageClient(self._client)
-        self.accounts = AccountsClient(self._client_v1)
+        self.accounts = AccountsClient(self._client)

@@ -3,5 +3,5 @@ class AccountsClient(object):
         self.client = client
 
     def list(self):
-        response = self.client.get('aws_accounts')
+        response = self.client.get('v1/aws_accounts')
         return response['aws_accounts']
